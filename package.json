@@ -1,0 +1,26 @@
+{
+  "name": "@polpware/fe-data",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^7.2.0",
+    "@angular/core": "^7.2.0",
+    "@ngrx/store": "^7.0.0",
+    "@ngrx/store-devtools": "^7.0.0",
+    "@polpware/fe-dependencies": "https://github.com/polpware-frontend-modules/polpware-fe-dependencies.git",
+    "@polpware/fe-utilities": "https://github.com/polpware-frontend-modules/polpware-fe-utilities.git",
+    "polpware-tinymce-tailor": "https://github.com/polpware-frontend-modules/polpware-tinymce-tailor.git"
+  },
+  "main": "bundles/polpware-fe-data.umd.js",
+  "module": "fesm5/polpware-fe-data.js",
+  "es2015": "fesm2015/polpware-fe-data.js",
+  "esm5": "esm5/polpware-fe-data.js",
+  "esm2015": "esm2015/polpware-fe-data.js",
+  "fesm5": "fesm5/polpware-fe-data.js",
+  "fesm2015": "fesm2015/polpware-fe-data.js",
+  "typings": "polpware-fe-data.d.ts",
+  "metadata": "polpware-fe-data.metadata.json",
+  "sideEffects": false,
+  "dependencies": {
+    "tslib": "^1.9.0"
+  }
+}

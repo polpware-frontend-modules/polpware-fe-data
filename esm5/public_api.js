@@ -1,0 +1,44 @@
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+export { RelationalTable } from './lib/relational/table';
+export { DummyRecords } from './lib/relational/dummy-records';
+export { RelationDatabase } from './lib/relational/database';
+export {} from './lib/relational/interfaces';
+export { sendPromise } from './lib/net/xhr-promise';
+export { loadJsonUriP, pingP, loadHtmlP } from './lib/net/curl';
+export { SlidingExpirationCache } from './lib/cache/sliding-expiration-cache';
+export {} from './lib/cache/cache-backend.interface';
+export { MemoryBackend } from './lib/cache/memory-backend';
+export {} from './lib/cache/sliding-expire-cache.interface';
+export { adaptToOpenIDToken, OpenIDPolicy } from './lib/security/open-id-policy';
+export { PolicyBase } from './lib/security/policy-base';
+export { NullPolicy } from './lib/security/null-policy';
+export { UserCredential } from './lib/security/user-credential';
+export { AntiForgeryKeyPolicy } from './lib/security/antiforgerykey-policy';
+export { adaptToOAuthToken, OAuthTokenExtPolicy } from './lib/security/oauth-token-ext-policy';
+export { OAuthTokenPolicy } from './lib/security/oauth-token-policy';
+export { DummyOAuthTokenCtorParams } from './lib/security/interfaces';
+export { observableDecorator } from './lib/decorators/observable.decorator';
+export {} from './lib/generic-store/collection-action-def';
+export { factory } from './lib/generic-store/factory';
+export {} from './lib/generic-store/collection-store.interface';
+export { CollectionStore } from './lib/generic-store/collection.store';
+export { CollectionAbstractStore } from './lib/generic-store/collection-abstract.store';
+export { reducer } from './lib/generic-store/reducers/collection.reducer';
+export { buildInitialState, buildReducerMap } from './lib/generic-store/reducers/index';
+export { AggregateCollection } from './lib/backend/aggregate-collection';
+export { mountSyncListener, mountSyncBeforeAdvice, mountSyncAroundAdvice, mountAjaxBeforeAdvice } from './lib/backend/event-hub';
+export { endPointEnum, syncMethodEnum, GlobalProvider } from './lib/backend/provider';
+export {} from './lib/backend/interfaces';
+export { getEntity, updateEntity, cleanEntity, insertEntities, findEntityById, removeEntityById, insertOrUpdateEntity, cleanEntityGroup } from './lib/storage/localstorage-util';
+export { LocalStorageTable } from './lib/storage/localstorage-table';
+export { I18n } from './lib/i18n/dict';
+export { ResourceLoader } from './lib/i18n/resource-loader';
+export {} from './lib/interfaces/joint-point.interface';
+export {} from './lib/interfaces/event-args.interface';
+export {} from './lib/interfaces/observable.interface';
+export {} from './lib/interfaces/backbone.interface';
+export {} from './lib/interfaces/ng-zone-like.interface';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljX2FwaS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0Bwb2xwd2FyZS9mZS1kYXRhLyIsInNvdXJjZXMiOlsicHVibGljX2FwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7O0FBQ0EsZ0NBQWMsd0JBQXdCLENBQUM7QUFDdkMsNkJBQWMsZ0NBQWdDLENBQUM7QUFDL0MsaUNBQWMsMkJBQTJCLENBQUM7QUFDMUMsZUFBYyw2QkFBNkIsQ0FBQztBQUM1Qyw0QkFBYyx1QkFBdUIsQ0FBQztBQUN0QywrQ0FBYyxnQkFBZ0IsQ0FBQztBQUMvQix1Q0FBYyxzQ0FBc0MsQ0FBQztBQUNyRCxlQUFjLHFDQUFxQyxDQUFDO0FBQ3BELDhCQUFjLDRCQUE0QixDQUFDO0FBQzNDLGVBQWMsNENBQTRDLENBQUM7QUFDM0QsaURBQWMsK0JBQStCLENBQUM7QUFDOUMsMkJBQWMsNEJBQTRCLENBQUM7QUFDM0MsMkJBQWMsNEJBQTRCLENBQUM7QUFDM0MsK0JBQWMsZ0NBQWdDLENBQUM7QUFDL0MscUNBQWMsc0NBQXNDLENBQUM7QUFDckQsdURBQWMsdUNBQXVDLENBQUM7QUFDdEQsaUNBQWMsbUNBQW1DLENBQUM7QUFDbEQsMENBQWMsMkJBQTJCLENBQUM7QUFDMUMsb0NBQWMsdUNBQXVDLENBQUM7QUFDdEQsZUFBYywyQ0FBMkMsQ0FBQztBQUMxRCx3QkFBYyw2QkFBNkIsQ0FBQztBQUM1QyxlQUFjLGdEQUFnRCxDQUFDO0FBQy9ELGdDQUFjLHNDQUFzQyxDQUFDO0FBQ3JELHdDQUFjLCtDQUErQyxDQUFDO0FBQzlELHdCQUFjLGlEQUFpRCxDQUFDO0FBQ2hFLG1EQUFjLG9DQUFvQyxDQUFDO0FBQ25ELG9DQUFjLG9DQUFvQyxDQUFDO0FBQ25ELHVHQUFjLHlCQUF5QixDQUFDO0FBQ3hDLDZEQUFjLHdCQUF3QixDQUFDO0FBQ3ZDLGVBQWMsMEJBQTBCLENBQUM7QUFDekMsK0lBQWMsaUNBQWlDLENBQUM7QUFDaEQsa0NBQWMsa0NBQWtDLENBQUM7QUFDakQscUJBQWMsaUJBQWlCLENBQUM7QUFDaEMsK0JBQWMsNEJBQTRCLENBQUM7QUFDM0MsZUFBYyx3Q0FBd0MsQ0FBQztBQUN2RCxlQUFjLHVDQUF1QyxDQUFDO0FBQ3RELGVBQWMsdUNBQXVDLENBQUM7QUFDdEQsZUFBYyxxQ0FBcUMsQ0FBQztBQUNwRCxlQUFjLHlDQUF5QyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiXG5leHBvcnQgKiBmcm9tICcuL2xpYi9yZWxhdGlvbmFsL3RhYmxlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL3JlbGF0aW9uYWwvZHVtbXktcmVjb3Jkcyc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9yZWxhdGlvbmFsL2RhdGFiYXNlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL3JlbGF0aW9uYWwvaW50ZXJmYWNlcyc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9uZXQveGhyLXByb21pc2UnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvbmV0L2N1cmwnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvY2FjaGUvc2xpZGluZy1leHBpcmF0aW9uLWNhY2hlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2NhY2hlL2NhY2hlLWJhY2tlbmQuaW50ZXJmYWNlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2NhY2hlL21lbW9yeS1iYWNrZW5kJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2NhY2hlL3NsaWRpbmctZXhwaXJlLWNhY2hlLmludGVyZmFjZSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zZWN1cml0eS9vcGVuLWlkLXBvbGljeSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zZWN1cml0eS9wb2xpY3ktYmFzZSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zZWN1cml0eS9udWxsLXBvbGljeSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zZWN1cml0eS91c2VyLWNyZWRlbnRpYWwnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvc2VjdXJpdHkvYW50aWZvcmdlcnlrZXktcG9saWN5JztcbmV4cG9ydCAqIGZyb20gJy4vbGliL3NlY3VyaXR5L29hdXRoLXRva2VuLWV4dC1wb2xpY3knO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvc2VjdXJpdHkvb2F1dGgtdG9rZW4tcG9saWN5JztcbmV4cG9ydCAqIGZyb20gJy4vbGliL3NlY3VyaXR5L2ludGVyZmFjZXMnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvZGVjb3JhdG9ycy9vYnNlcnZhYmxlLmRlY29yYXRvcic7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9nZW5lcmljLXN0b3JlL2NvbGxlY3Rpb24tYWN0aW9uLWRlZic7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9nZW5lcmljLXN0b3JlL2ZhY3RvcnknO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvZ2VuZXJpYy1zdG9yZS9jb2xsZWN0aW9uLXN0b3JlLmludGVyZmFjZSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9nZW5lcmljLXN0b3JlL2NvbGxlY3Rpb24uc3RvcmUnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvZ2VuZXJpYy1zdG9yZS9jb2xsZWN0aW9uLWFic3RyYWN0LnN0b3JlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2dlbmVyaWMtc3RvcmUvcmVkdWNlcnMvY29sbGVjdGlvbi5yZWR1Y2VyJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2dlbmVyaWMtc3RvcmUvcmVkdWNlcnMvaW5kZXgnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvYmFja2VuZC9hZ2dyZWdhdGUtY29sbGVjdGlvbic7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9iYWNrZW5kL2V2ZW50LWh1Yic7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9iYWNrZW5kL3Byb3ZpZGVyJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2JhY2tlbmQvaW50ZXJmYWNlcyc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zdG9yYWdlL2xvY2Fsc3RvcmFnZS11dGlsJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL3N0b3JhZ2UvbG9jYWxzdG9yYWdlLXRhYmxlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2kxOG4vZGljdCc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9pMThuL3Jlc291cmNlLWxvYWRlcic7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9pbnRlcmZhY2VzL2pvaW50LXBvaW50LmludGVyZmFjZSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9pbnRlcmZhY2VzL2V2ZW50LWFyZ3MuaW50ZXJmYWNlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2ludGVyZmFjZXMvb2JzZXJ2YWJsZS5pbnRlcmZhY2UnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvaW50ZXJmYWNlcy9iYWNrYm9uZS5pbnRlcmZhY2UnO1xuZXhwb3J0ICogZnJvbSAnLi9saWIvaW50ZXJmYWNlcy9uZy16b25lLWxpa2UuaW50ZXJmYWNlJztcbiJdfQ==
