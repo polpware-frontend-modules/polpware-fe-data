@@ -6,7 +6,7 @@ import { ActionsSubject, ScannedActionsSubject, combineReducers, ReducerManager,
 import { __assign, __extends, __spread, __decorate, __metadata } from 'tslib';
 import { Injectable } from '@angular/core';
 import { data, add, translate } from 'polpware-tinymce-tailor/src/util/I18n';
-import { backbone, jquery, underscore, meld, when, locache, constraintjs, data-flow } from '@polpware/fe-dependencies';
+import { backbone, jquery, underscore, meld, when, locache, constraintjs, dataflow } from '@polpware/fe-dependencies';
 import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, tyArray, ok, tyObject } from '@polpware/fe-utilities';
 
 /**
@@ -2612,7 +2612,7 @@ function mountAjaxBeforeAdvice(callback) {
  * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
-var DataFlow = data-flow;
+var DataFlow = dataflow;
 /** @type {?} */
 var backbone$4 = backbone;
 /** @type {?} */
@@ -2826,7 +2826,7 @@ var GlobalProvider = /** @class */ (function () {
         /** @type {?} */
         var cfgMapping = this.configurationMapping;
         /** @type {?} */
-        var dataflow = this._dataflow;
+        var dataflow$$1 = this._dataflow;
         /** @type {?} */
         var uniqueName = this._uniqueNamePrefix + name;
         if (cfgMapping[uniqueName]) {
@@ -2844,12 +2844,12 @@ var GlobalProvider = /** @class */ (function () {
                 if (syncMethodEnum.hasOwnProperty(k)) {
                     /** @type {?} */
                     var value = syncMethodEnum[k];
-                    dataflow[name + ':' + value] = 1;
+                    dataflow$$1[name + ':' + value] = 1;
                 }
             }
         }
         else {
-            dataflow[name + ':' + syncMethodEnum.read] = 1;
+            dataflow$$1[name + ':' + syncMethodEnum.read] = 1;
         }
     };
     /**
@@ -2944,8 +2944,8 @@ var GlobalProvider = /** @class */ (function () {
      */
     function (name, callback) {
         /** @type {?} */
-        var dataflow = this._dataflow;
-        dataflow.when(name, callback);
+        var dataflow$$1 = this._dataflow;
+        dataflow$$1.when(name, callback);
     };
     /**
      * Defines the dependency.
@@ -2964,9 +2964,9 @@ var GlobalProvider = /** @class */ (function () {
      */
     function (src, dst) {
         /** @type {?} */
-        var dataflow = this._dataflow;
-        dataflow.on(src, function () {
-            dataflow[dst] = dataflow[dst] + 1;
+        var dataflow$$1 = this._dataflow;
+        dataflow$$1.on(src, function () {
+            dataflow$$1[dst] = dataflow$$1[dst] + 1;
         });
     };
     /**

@@ -2659,7 +2659,7 @@
      * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
-    var DataFlow = dependencies.data-flow;
+    var DataFlow = dependencies.dataflow;
     /** @type {?} */
     var backbone$3 = dependencies.backbone;
     /** @type {?} */
