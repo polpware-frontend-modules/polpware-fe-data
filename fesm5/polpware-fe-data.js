@@ -1,12 +1,7 @@
-import { send } from 'polpware-tinymce-tailor/src/util/XHR';
-import { extend } from 'polpware-tinymce-tailor/src/util/Tools';
-import * as EventDispatcher from 'polpware-tinymce-tailor/src/util/EventDispatcher';
-import { isNative } from 'polpware-tinymce-tailor/src/util/EventDispatcher';
 import { ActionsSubject, ScannedActionsSubject, combineReducers, ReducerManager, State, Store } from '@ngrx/store';
 import { __assign, __extends, __spread, __decorate, __metadata } from 'tslib';
 import { Injectable } from '@angular/core';
-import { data, add, translate } from 'polpware-tinymce-tailor/src/util/I18n';
-import { backbone, jquery, underscore, meld, when, locache, constraintjs, dataflow } from '@polpware/fe-dependencies';
+import { backbone, Tools, jquery, underscore, meld, I18n, XHR, EventDispatcher, when, locache, constraintjs, dataflow } from '@polpware/fe-dependencies';
 import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, tyArray, ok, tyObject } from '@polpware/fe-utilities';
 
 /**
@@ -578,6 +573,8 @@ var RelationDatabase = /** @class */ (function () {
  * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
+var XHR$1 = XHR;
+/** @type {?} */
 var _$1 = underscore;
 /** @type {?} */
 var defaultOptions = {
@@ -632,7 +629,7 @@ function sendPromise(options) {
         else if (settings.content_type === 'application/json') {
             xhrSettings.data = JSON.stringify(xhrSettings.data);
         }
-        send(xhrSettings);
+        XHR$1.send(xhrSettings);
     });
     return promise;
 }
@@ -641,6 +638,8 @@ function sendPromise(options) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
+/** @type {?} */
+var tools = Tools;
 /** @type {?} */
 var $ = jquery;
 /**
@@ -674,7 +673,7 @@ function loadJsonUriP(url) {
 function pingP(url, options) {
     options = options || {};
     /** @type {?} */
-    var ajaxParams = extend({ url: url }, options);
+    var ajaxParams = tools.extend({ url: url }, options);
     return $.ajax(ajaxParams);
 }
 /**
@@ -687,10 +686,10 @@ function loadHtmlP(url) {
     return $.ajax({
         url: url,
         dataType: 'html text'
-    }).then(function (data$$1) {
+    }).then(function (data) {
         /*global DOMParser */
         /** @type {?} */
-        var doc = new DOMParser().parseFromString(data$$1, 'text/html');
+        var doc = new DOMParser().parseFromString(data, 'text/html');
         return $(doc);
     });
 }
@@ -822,12 +821,14 @@ MemoryBackend = /** @class */ (function () {
  * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 /** @type {?} */
+var EventDispatcher$1 = EventDispatcher;
+/** @type {?} */
 var getEventDispatcher = function (obj) {
     if (!obj._eventDispatcher) {
-        obj._eventDispatcher = new EventDispatcher({
+        obj._eventDispatcher = new EventDispatcher$1({
             scope: obj,
             toggleEvent: function (name, state) {
-                if (isNative(name) && obj.toggleNativeEvent) {
+                if (EventDispatcher$1.isNative(name) && obj.toggleNativeEvent) {
                     obj.toggleNativeEvent(name, state);
                 }
             }
@@ -1314,13 +1315,13 @@ var $$1 = jquery;
  * @param {?} data
  * @return {?}
  */
-function adaptToOAuthToken(data$$1) {
-    data$$1 = data$$1 || {};
-    data$$1.expiresIn = data$$1.expiresIn || 0;
-    data$$1.createdOn = data$$1.createdOn || 0;
-    data$$1.token = data$$1.token || '';
-    data$$1.refreshToken = data$$1.refreshToken || '';
-    return data$$1;
+function adaptToOAuthToken(data) {
+    data = data || {};
+    data.expiresIn = data.expiresIn || 0;
+    data.createdOn = data.createdOn || 0;
+    data.token = data.token || '';
+    data.refreshToken = data.refreshToken || '';
+    return data;
 }
 var OAuthTokenPolicy = /** @class */ (function (_super) {
     __extends(OAuthTokenPolicy, _super);
@@ -1532,11 +1533,11 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
  * @param {?} data
  * @return {?}
  */
-function adaptToOpenIDToken(data$$1) {
-    data$$1 = data$$1 || {};
+function adaptToOpenIDToken(data) {
+    data = data || {};
     /** @type {?} */
-    var r = adaptToOAuthToken(data$$1);
-    return __assign({}, r, { openId: data$$1.openId || '' });
+    var r = adaptToOAuthToken(data);
+    return __assign({}, r, { openId: data.openId || '' });
 }
 var OpenIDPolicy = /** @class */ (function (_super) {
     __extends(OpenIDPolicy, _super);
@@ -1786,8 +1787,8 @@ var UserCredential = /** @class */ (function () {
      * @param {?} data
      * @return {?}
      */
-    function (data$$1) {
-        this._user = _$4.extend(this._user, data$$1);
+    function (data) {
+        this._user = _$4.extend(this._user, data);
     };
     /**
      * @template U
@@ -1799,11 +1800,11 @@ var UserCredential = /** @class */ (function () {
      * @param {?} data
      * @return {?}
      */
-    function (data$$1) {
-        if (isEquiva(this._user, data$$1)) {
+    function (data) {
+        if (isEquiva(this._user, data)) {
             return;
         }
-        this._user = data$$1;
+        this._user = data;
         this.asObservable.fire('change:user', {
             data: this._user
         });
@@ -1818,9 +1819,9 @@ var UserCredential = /** @class */ (function () {
      * @param {?} data
      * @return {?}
      */
-    function (data$$1) {
+    function (data) {
         /** @type {?} */
-        var newData = _$4.extend({}, this._user, data$$1);
+        var newData = _$4.extend({}, this._user, data);
         this.setUser(newData);
     };
     /**
@@ -1920,7 +1921,7 @@ function getTokenInternal(url, elementTag, inputField) {
         url: url,
         // A page containing required tokens
         dataType: 'html text'
-    }).then(function (data$$1) {
+    }).then(function (data) {
         /*global DOMParser */
         /** @type {?} */
         var doc;
@@ -1929,7 +1930,7 @@ function getTokenInternal(url, elementTag, inputField) {
         /** @type {?} */
         var elm;
         token = '';
-        doc = new DOMParser().parseFromString(data$$1, 'text/html');
+        doc = new DOMParser().parseFromString(data, 'text/html');
         if (elementTag) {
             elm = $$2(doc).find(elementTag);
             if (elm.length > 0) {
@@ -2077,8 +2078,8 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
      */
     function (options) {
         /** @type {?} */
-        var data$$1 = options.data;
-        data$$1[this._antiForgeryKey] = this.token;
+        var data = options.data;
+        data[this._antiForgeryKey] = this.token;
     };
     /**
      * Apply security policy to the given options.
@@ -3054,21 +3055,21 @@ var union = _$7.union;
  */
 function getEntity(key, ty) {
     /** @type {?} */
-    var data$$1 = defaultValue(ty);
+    var data = defaultValue(ty);
     try {
         /** @type {?} */
         var tmp = globalLocalStorage.getItem(key);
         if (tmp && tmp !== 'undefined') {
             tmp = JSON.parse(tmp);
             if (ok(tmp, ty)) {
-                data$$1 = tmp;
+                data = tmp;
             }
         }
     }
     catch (ex) {
         console.log(ex);
     }
-    return data$$1;
+    return data;
 }
 /**
  * Updates the value of an entity by its key.
@@ -3077,10 +3078,10 @@ function getEntity(key, ty) {
  * @param {?=} ty
  * @return {?}
  */
-function updateEntity(key, data$$1, ty) {
+function updateEntity(key, data, ty) {
     if (ty === void 0) { ty = null; }
     try {
-        globalLocalStorage.setItem(key, JSON.stringify(data$$1));
+        globalLocalStorage.setItem(key, JSON.stringify(data));
     }
     catch (ex) {
         console.log(ex);
@@ -3109,16 +3110,16 @@ function cleanEntity(key, ty) {
  * @param {?} upperBound
  * @return {?}
  */
-function insertEntities(key, data$$1, upperBound) {
+function insertEntities(key, data, upperBound) {
     /** @type {?} */
     var newData = [];
     /** @type {?} */
     var currentData = (/** @type {?} */ (getEntity(key, tyArray)));
     if (upperBound > 0 && currentData.length > upperBound) {
-        newData = data$$1;
+        newData = data;
     }
     else {
-        newData = union(currentData, data$$1);
+        newData = union(currentData, data);
     }
     updateEntity(key, newData, tyArray);
 }
@@ -3130,8 +3131,8 @@ function insertEntities(key, data$$1, upperBound) {
  */
 function findEntityById(key, id) {
     /** @type {?} */
-    var data$$1 = (/** @type {?} */ (getEntity(key, tyArray)));
-    return find(data$$1, { Id: id });
+    var data = (/** @type {?} */ (getEntity(key, tyArray)));
+    return find(data, { Id: id });
 }
 /**
  * Removes an element of an entity of type array.
@@ -3141,14 +3142,14 @@ function findEntityById(key, id) {
  */
 function removeEntityById(key, id) {
     /** @type {?} */
-    var data$$1 = (/** @type {?} */ (getEntity(key, tyArray)));
+    var data = (/** @type {?} */ (getEntity(key, tyArray)));
     /** @type {?} */
-    var index = findIndex(data$$1, { Id: id });
+    var index = findIndex(data, { Id: id });
     if (index === -1) {
         return;
     }
-    data$$1.splice(index, 1);
-    updateEntity(key, data$$1, tyArray);
+    data.splice(index, 1);
+    updateEntity(key, data, tyArray);
 }
 /**
  * Inserts or udpates an element of an entity of type array.
@@ -3158,16 +3159,16 @@ function removeEntityById(key, id) {
  */
 function insertOrUpdateEntity(key, entity) {
     /** @type {?} */
-    var data$$1 = (/** @type {?} */ (getEntity(key, tyArray)));
+    var data = (/** @type {?} */ (getEntity(key, tyArray)));
     /** @type {?} */
-    var index = findIndex(data$$1, { Id: entity.Id });
+    var index = findIndex(data, { Id: entity.Id });
     if (index !== -1) {
-        data$$1[index] = entity;
+        data[index] = entity;
     }
     else {
-        data$$1.push(entity);
+        data.push(entity);
     }
-    updateEntity(key, data$$1, tyArray);
+    updateEntity(key, data, tyArray);
 }
 /**
  * Removes a group of entities by a given prefix.
@@ -3220,8 +3221,8 @@ var LocalStorageTable = /** @class */ (function () {
      */
     function (key) {
         /** @type {?} */
-        var data$$1 = getEntity(key, tyObject);
-        return lift(data$$1, null);
+        var data = getEntity(key, tyObject);
+        return lift(data, null);
     };
     /**
      * Removes the key from the keychain.
@@ -3278,19 +3279,21 @@ var LocalStorageTable = /** @class */ (function () {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-var I18n = /** @class */ (function () {
-    function I18n() {
+/** @type {?} */
+var _i18n = I18n;
+var I18n$1 = /** @class */ (function () {
+    function I18n$$1() {
     }
     /**
      * @param {?} code
      * @return {?}
      */
-    I18n.getDictByCode = /**
+    I18n$$1.getDictByCode = /**
      * @param {?} code
      * @return {?}
      */
     function (code) {
-        return data[code];
+        return _i18n.data[code];
     };
     /**
      * Add a languge dictionary and set the current
@@ -3303,7 +3306,7 @@ var I18n = /** @class */ (function () {
      * @param {?} items
      * @return {?}
      */
-    I18n.add = /**
+    I18n$$1.add = /**
      * Add a languge dictionary and set the current
      * code as the current language.
      * @param {?} code
@@ -3311,7 +3314,7 @@ var I18n = /** @class */ (function () {
      * @return {?}
      */
     function (code, items) {
-        add(code, items);
+        _i18n.add(code, items);
     };
     /**
      * Trnsaltes a given text. If the given text
@@ -3328,7 +3331,7 @@ var I18n = /** @class */ (function () {
      * @param {?} defaultText
      * @return {?}
      */
-    I18n.translate = /**
+    I18n$$1.translate = /**
      * Trnsaltes a given text. If the given text
      * is missing in the dictionary, use the given default value.
      * @param {?} text
@@ -3337,7 +3340,7 @@ var I18n = /** @class */ (function () {
      */
     function (text, defaultText) {
         /** @type {?} */
-        var value = translate(text);
+        var value = _i18n.translate(text);
         if (value === text && defaultText) {
             return defaultText;
         }
@@ -3353,19 +3356,19 @@ var I18n = /** @class */ (function () {
      * @param {?} code
      * @return {?}
      */
-    I18n.recycleOthers = /**
+    I18n$$1.recycleOthers = /**
      * Removes unused languages to release memory.
      * @param {?} code
      * @return {?}
      */
     function (code) {
         /** @type {?} */
-        var data$$1 = data;
+        var data = _i18n.data;
         /** @type {?} */
         var recycleList = [];
-        for (var key in data$$1) {
+        for (var key in data) {
             // skip loop if the property is from prototype
-            if (data$$1.hasOwnProperty(key) && key !== code) {
+            if (data.hasOwnProperty(key) && key !== code) {
                 recycleList.push(key);
             }
         }
@@ -3373,10 +3376,10 @@ var I18n = /** @class */ (function () {
         for (var i = 0; i < recycleList.length; i++) {
             /** @type {?} */
             var k = recycleList[i];
-            delete data$$1[k];
+            delete data[k];
         }
     };
-    return I18n;
+    return I18n$$1;
 }());
 
 /**
@@ -3580,6 +3583,6 @@ var ResourceLoader = /** @class */ (function () {
  * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 
-export { RelationalTable, DummyRecords, RelationDatabase, sendPromise, loadJsonUriP, pingP, loadHtmlP, SlidingExpirationCache, MemoryBackend, adaptToOpenIDToken, OpenIDPolicy, PolicyBase, NullPolicy, UserCredential, AntiForgeryKeyPolicy, adaptToOAuthToken, OAuthTokenExtPolicy, OAuthTokenPolicy, DummyOAuthTokenCtorParams, observableDecorator, factory, CollectionStore, CollectionAbstractStore, reducer, buildInitialState, buildReducerMap, AggregateCollection, mountSyncListener, mountSyncBeforeAdvice, mountSyncAroundAdvice, mountAjaxBeforeAdvice, endPointEnum, syncMethodEnum, GlobalProvider, getEntity, updateEntity, cleanEntity, insertEntities, findEntityById, removeEntityById, insertOrUpdateEntity, cleanEntityGroup, LocalStorageTable, I18n, ResourceLoader };
+export { RelationalTable, DummyRecords, RelationDatabase, sendPromise, loadJsonUriP, pingP, loadHtmlP, SlidingExpirationCache, MemoryBackend, adaptToOpenIDToken, OpenIDPolicy, PolicyBase, NullPolicy, UserCredential, AntiForgeryKeyPolicy, adaptToOAuthToken, OAuthTokenExtPolicy, OAuthTokenPolicy, DummyOAuthTokenCtorParams, observableDecorator, factory, CollectionStore, CollectionAbstractStore, reducer, buildInitialState, buildReducerMap, AggregateCollection, mountSyncListener, mountSyncBeforeAdvice, mountSyncAroundAdvice, mountAjaxBeforeAdvice, endPointEnum, syncMethodEnum, GlobalProvider, getEntity, updateEntity, cleanEntity, insertEntities, findEntityById, removeEntityById, insertOrUpdateEntity, cleanEntityGroup, LocalStorageTable, I18n$1 as I18n, ResourceLoader };
 
 //# sourceMappingURL=polpware-fe-data.js.map

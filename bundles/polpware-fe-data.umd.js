@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('polpware-tinymce-tailor/src/util/XHR'), require('polpware-tinymce-tailor/src/util/Tools'), require('polpware-tinymce-tailor/src/util/EventDispatcher'), require('@ngrx/store'), require('@angular/core'), require('polpware-tinymce-tailor/src/util/I18n'), require('@polpware/fe-dependencies'), require('@polpware/fe-utilities')) :
-    typeof define === 'function' && define.amd ? define('@polpware/fe-data', ['exports', 'polpware-tinymce-tailor/src/util/XHR', 'polpware-tinymce-tailor/src/util/Tools', 'polpware-tinymce-tailor/src/util/EventDispatcher', '@ngrx/store', '@angular/core', 'polpware-tinymce-tailor/src/util/I18n', '@polpware/fe-dependencies', '@polpware/fe-utilities'], factory) :
-    (factory((global.polpware = global.polpware || {}, global.polpware['fe-data'] = {}),global['polpware-tinymce-tailor/src/util/XHR'],global['polpware-tinymce-tailor/src/util/Tools'],global['polpware-tinymce-tailor/src/util/EventDispatcher'],global.ngrxStore,global.ng.core,global['polpware-tinymce-tailor/src/util/I18n'],global.dependencies,global.polpwareUtil));
-}(this, (function (exports,XHR,tools,EventDispatcher,ngrxStore,core,_i18n,dependencies,polpwareUtil) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@ngrx/store'), require('@angular/core'), require('@polpware/fe-dependencies'), require('@polpware/fe-utilities')) :
+    typeof define === 'function' && define.amd ? define('@polpware/fe-data', ['exports', '@ngrx/store', '@angular/core', '@polpware/fe-dependencies', '@polpware/fe-utilities'], factory) :
+    (factory((global.polpware = global.polpware || {}, global.polpware['fe-data'] = {}),global.ngrxStore,global.ng.core,global.dependencies,global.polpwareUtil));
+}(this, (function (exports,ngrxStore,core,dependencies,polpwareUtil) { 'use strict';
 
     /**
      * @fileoverview added by tsickle
@@ -566,6 +566,8 @@
      * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
+    var XHR = dependencies.XHR;
+    /** @type {?} */
     var _$1 = dependencies.underscore;
     /** @type {?} */
     var defaultOptions = {
@@ -629,6 +631,8 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    /** @type {?} */
+    var tools = dependencies.Tools;
     /** @type {?} */
     var $ = dependencies.jquery;
     /**
@@ -892,6 +896,8 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    /** @type {?} */
+    var EventDispatcher = dependencies.EventDispatcher;
     /** @type {?} */
     var getEventDispatcher = function (obj) {
         if (!obj._eventDispatcher) {
@@ -3320,6 +3326,8 @@
      * @fileoverview added by tsickle
      * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
+    /** @type {?} */
+    var _i18n = dependencies.I18n;
     var I18n = /** @class */ (function () {
         function I18n() {
         }

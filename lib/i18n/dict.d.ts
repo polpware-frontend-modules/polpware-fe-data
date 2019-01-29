@@ -1,3 +1,10 @@
+/**
+ * @fileOverview
+ * Provides i18n service. This module is designed as
+ * a delegate of the tinymce I18n service.
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
+ */
 export declare class I18n {
     static getDictByCode(code: string): any;
     /**
