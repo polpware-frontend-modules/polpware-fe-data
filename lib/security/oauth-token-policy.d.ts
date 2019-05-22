@@ -13,6 +13,7 @@ export declare class OAuthTokenPolicy extends PolicyBase {
     protected createdOn: number;
     protected refreshToken: string;
     grantType: 'authorization_code' | 'refresh_token' | 'password' | 'client_credentials';
+    response: any;
     constructor(settings: IOAuthTokenPolicyCtorOptions);
     /**
      * Feeds the policy with some settings from outside,

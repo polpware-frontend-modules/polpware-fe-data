@@ -1,24 +1,18 @@
+import { backbone as backbone$4, underscore, constraintjs, XHR as XHR$1, Tools, jquery, EventDispatcher as EventDispatcher$1, locache as locache$1, meld as meld$2, when as when$1, dataflow, I18n as I18n$1 } from '@polpware/fe-dependencies';
+import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, ok, tyArray, tyObject } from '@polpware/fe-utilities';
 import { __decorate, __metadata } from 'tslib';
-import { ActionsSubject, ScannedActionsSubject, combineReducers, ReducerManager, State, Store } from '@ngrx/store';
+import { ActionsSubject, ScannedActionsSubject, ReducerManager, State, Store, combineReducers } from '@ngrx/store';
 import { Injectable } from '@angular/core';
-import { backbone, Tools, jquery, underscore, meld, I18n, XHR, EventDispatcher, when, constraintjs, locache, dataflow } from '@polpware/fe-dependencies';
-import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, tyArray, ok, tyObject } from '@polpware/fe-utilities';
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a table in a relational database.
+ * This table is observable, i.e., any change on this table will be notified to its listeners.
  */
-/** @type {?} */
-const backbone$1 = backbone;
-/** @type {?} */
+const backbone = backbone$4;
 const _ = underscore;
-/** @type {?} */
 const cjs = constraintjs;
 class RelationalTable {
-    /**
-     * @param {?} options
-     * @param {?} dummyRecords
-     */
     constructor(options, dummyRecords) {
         this.dummyRecords = dummyRecords;
         this._name = options.name;
@@ -29,8 +23,7 @@ class RelationalTable {
             this._dataProvider = new options.dataProviderCtor();
         }
         else {
-            /** @type {?} */
-            const ctor = backbone$1.Collection.extend(options.dataProviderCtorOption || {});
+            const ctor = backbone.Collection.extend(options.dataProviderCtorOption || {});
             this._dataProvider = new ctor();
         }
         this._addConstraint = cjs.constraint([]);
@@ -42,58 +35,36 @@ class RelationalTable {
         // Set up constraint
         this._deleteConstraint.onChange(this._onDeletedHandler);
     }
-    /**
-     * @return {?}
-     */
     get name() {
         return this._name;
     }
-    /**
-     * @return {?}
-     */
     get cascade() {
         return this._cascade;
     }
-    /**
-     * @return {?}
-     */
     dataProvider() {
         return this._dataProvider;
     }
     // TODO: Figure out ...
-    /**
-     * @return {?}
-     */
     onDeleted() {
     }
     /**
      * Check if the given items are still in use.
-     * @private
-     * @param {?} item
-     * @return {?}
      */
     hasAnyReference(item) {
         // Check if this item is in this table or not
-        /** @type {?} */
         const itemInTable = this._dataProvider.get(item.id);
         if (!itemInTable) {
             return false;
         }
-        /** @type {?} */
         const revRelations = this._reverseForeignRelation;
-        /** @type {?} */
         let hasFound = false;
         for (const revK in revRelations) {
             if (revRelations.hasOwnProperty(revK)) {
-                /** @type {?} */
                 const revTables = revRelations[revK];
                 hasFound = _.some(revTables, (fromTable) => {
-                    /** @type {?} */
                     const fromTableDataProvider = fromTable.dataProvider();
-                    /** @type {?} */
                     const filter = {};
                     filter[revK] = item.id;
-                    /** @type {?} */
                     const anyUse = fromTableDataProvider.findWhere(filter);
                     return !!anyUse;
                 });
@@ -106,27 +77,18 @@ class RelationalTable {
     }
     /**
      * Removing any items in other tables which depend on the deleted item.
-     * @private
-     * @param {?} removedItems
-     * @return {?}
      */
     removeReverseForeign(removedItems) {
-        /** @type {?} */
         const revRelation = this._reverseForeignRelation;
         for (const revK in revRelation) {
             if (revRelation.hasOwnProperty(revK)) {
-                /** @type {?} */
                 const revTables = revRelation[revK];
                 revTables.forEach((reverseTable) => {
-                    /** @type {?} */
                     const dataProvider = reverseTable.dataProvider();
-                    /** @type {?} */
                     const toBeRemoved = [];
                     removedItems.forEach((item) => {
-                        /** @type {?} */
                         const filter = {};
                         filter[revK] = item.id;
-                        /** @type {?} */
                         const anyItems = dataProvider.where(filter);
                         pushArray(toBeRemoved, anyItems);
                     });
@@ -139,19 +101,11 @@ class RelationalTable {
     }
     /**
      * Gets the model in the table by id.
-     * @param {?} id
-     * @return {?}
      */
     get(id) {
         return this._dataProvider.get(id);
     }
-    /**
-     * @private
-     * @param {?} thatItem
-     * @return {?}
-     */
     destroyFromTable(thatItem) {
-        /** @type {?} */
         const removedItem = this._dataProvider.remove(thatItem);
         if (!removedItem) {
             return;
@@ -161,42 +115,26 @@ class RelationalTable {
         removedItem.trigger('destroy', removedItem);
         this.removeReverseForeign([removedItem]);
     }
-    /**
-     * @private
-     * @param {?} thatItem
-     * @param {?} foreignKey
-     * @return {?}
-     */
     getForeignModel(thatItem, foreignKey) {
-        /** @type {?} */
         const value = thatItem.attributes[foreignKey];
         // If we do not have this foreignKey, then return a dummy one
         if (!value) {
             return this.dummyRecords.getDummyRecord(foreignKey);
         }
-        /** @type {?} */
         const table = this._foreignRelation[foreignKey];
         return table.dataProvider().get(value);
     }
     /**
      * Adds an item in the Table and recursively add foreign items.
-     * @param {?} model
-     * @return {?}
      */
     add(model) {
-        /** @type {?} */
         const selfContext = this;
-        /** @type {?} */
         const dataProvider = this._dataProvider;
-        /** @type {?} */
         const foreignRelation = this._foreignRelation;
         // Check if the item to be added is already in this table.
-        /** @type {?} */
         const modelId = dataProvider.modelId(model);
-        /** @type {?} */
         let addedItem = dataProvider.get(modelId);
         if (addedItem) {
-            /** @type {?} */
             const newAttr = _.extend({}, addedItem.attributes, model);
             addedItem.set(newAttr);
             return addedItem;
@@ -205,17 +143,14 @@ class RelationalTable {
         addedItem = dataProvider.add(model);
         // Add convenient methods
         addedItem.destroyFromTable = function () {
-            /** @type {?} */
             const thatItem = this;
             selfContext.destroyFromTable(thatItem);
         };
         addedItem.getForeignModel = function (foreignKey) {
-            /** @type {?} */
             const thatItem = this;
             return selfContext.getForeignModel(thatItem, foreignKey);
         };
         addedItem.hasAnyReference = function () {
-            /** @type {?} */
             const thatItem = this;
             return selfContext.hasAnyReference(thatItem);
         };
@@ -223,8 +158,6 @@ class RelationalTable {
     }
     /**
      * Add many items into a table.
-     * @param {?} models
-     * @return {?}
      */
     addMany(models) {
         return models.map(model => {
@@ -233,9 +166,6 @@ class RelationalTable {
     }
     /**
      * Adds a foreign relation.
-     * @param {?} foreignKey
-     * @param {?} foreignTable
-     * @return {?}
      */
     addForeignRelation(foreignKey, foreignTable) {
         if (this._foreignRelation[foreignKey]) {
@@ -245,15 +175,10 @@ class RelationalTable {
     }
     /**
      * Add a reverse foreign relation.
-     * @param {?} reverseForeignKey
-     * @param {?} table
-     * @return {?}
      */
     addReverseForeignRelation(reverseForeignKey, table) {
-        /** @type {?} */
         const reverseTables = this._reverseForeignRelation[reverseForeignKey];
         if (reverseTables) {
-            /** @type {?} */
             const index = reverseTables.findIndex((elem) => {
                 return elem === table;
             });
@@ -268,23 +193,18 @@ class RelationalTable {
     }
     /**
      * Check if a given foreign relation is present.
-     * @param {?} foreignKey
-     * @return {?}
      */
     hasForeignRelation(foreignKey) {
         return !!this._foreignRelation[foreignKey];
     }
     /**
      * Checks if a given reverse foreign relation is present.
-     * @param {?} reverseForeignKey
-     * @return {?}
      */
     hasReverseForeignRelation(reverseForeignKey) {
         return !!this._reverseForeignRelation[reverseForeignKey];
     }
     /**
      * Destroys table
-     * @return {?}
      */
     destroy() {
         // Remove constraint
@@ -294,30 +214,26 @@ class RelationalTable {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a global dummy records for tables. Each table is configured with a dummy record.
  */
-/** @type {?} */
-const backbone$2 = backbone;
+const backbone$1 = backbone$4;
 class DummyRecords {
     constructor() {
         this._data = {};
     }
-    /**
-     * @param {?} key
-     * @return {?}
-     */
     getDummyRecord(key) {
         if (!this._data[key]) {
-            this._data[key] = new backbone$2.Model({});
+            this._data[key] = new backbone$1.Model({});
         }
         return this._data[key];
     }
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a relational database which supports foreign keys and primary keys.
+ * Also this database support cascading deletion and addition.
  */
 class RelationDatabase {
     /**
@@ -330,7 +246,6 @@ class RelationDatabase {
     }
     /**
      * Gets a reference of the file system database
-     * @return {?}
      */
     getReference() {
         this._referenceCounter++;
@@ -338,35 +253,27 @@ class RelationDatabase {
     }
     /**
      * Defines a table in the database.
-     * @param {?} options
-     * @return {?}
+     * @function addTable
+     * @param {Object} settings
      */
     addTable(options) {
         return this._tableCollection[options.name] = new RelationalTable(options, this._dummyRecords);
     }
     /**
      * Retrieves a table by name.
-     * @param {?} name
-     * @return {?}
      */
     getTable(name) {
         return this._tableCollection[name];
     }
     /**
      * Defines a foreign relation between two tables.
-     * @param {?} name
-     * @param {?} foreignKey
-     * @param {?} foreignName
-     * @return {?}
      */
     addForeignkey(name, foreignKey, foreignName) {
         // Constraints
-        /** @type {?} */
         const table = this._tableCollection[name];
         if (!table) {
             throw new Error('Undefined table: ' + name);
         }
-        /** @type {?} */
         const foreignTable = this._tableCollection[foreignName];
         if (!foreignTable) {
             throw new Error('Undefined foreign table: ' + foreignName);
@@ -376,14 +283,12 @@ class RelationDatabase {
     }
     /**
      * Destroys database
-     * @return {?}
      */
     destroy() {
         this._referenceCounter--;
         if (this._referenceCounter === 0) {
             for (const k in this._tableCollection) {
                 if (this._tableCollection.hasOwnProperty(k)) {
-                    /** @type {?} */
                     const table = this._tableCollection[k];
                     table.destroy();
                 }
@@ -394,19 +299,11 @@ class RelationDatabase {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a class for performing XHR in an exception way and in a promise way
  */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const XHR$1 = XHR;
-/** @type {?} */
+const XHR = XHR$1;
 const _$1 = underscore;
-/** @type {?} */
 const defaultOptions = {
     async: true,
     content_type: '',
@@ -416,16 +313,9 @@ const defaultOptions = {
     error_scope: null,
     scope: null
 };
-/**
- * @param {?} options
- * @return {?}
- */
 function sendPromise(options) {
-    /** @type {?} */
     const settings = _$1.extend({}, defaultOptions, options);
-    /** @type {?} */
     const promise = new Promise((resolve, reject) => {
-        /** @type {?} */
         const xhrSettings = {
             url: settings.url,
             content_type: settings.content_type,
@@ -459,18 +349,20 @@ function sendPromise(options) {
         else if (settings.content_type === 'application/json') {
             xhrSettings.data = JSON.stringify(xhrSettings.data);
         }
-        XHR$1.send(xhrSettings);
+        XHR.send(xhrSettings);
     });
     return promise;
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides a bunch of utilties on network communication.
+ * @name Curl.js
+ * @module hypercom/util/Curl
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
 const tools = Tools;
-/** @type {?} */
 const $ = jquery;
 /**
  * Load a local json file from the given url.
@@ -481,14 +373,13 @@ const $ = jquery;
  * In the future, we may use memory cache.
  * Also this method returns a promise compatible project, and
  * therefore, please use "then" to go future.
- * @param {?} url
- * @return {?}
+ * @function loadJsonUriP
+ * @param {String} url
+ * @returns {Promise}
  */
 function loadJsonUriP(url) {
-    /** @type {?} */
     const deferred = $.ajax({
         url: url,
-        /* 'lang/options.json', */
         cache: true,
         dataType: 'json'
     });
@@ -496,21 +387,22 @@ function loadJsonUriP(url) {
 }
 /**
  * Tests if a url is reachable.
- * @param {?} url
- * @param {?} options
- * @return {?}
+ * @function pingP
+ * @param {String} url The url to be tested.
+ * @param {Object} [options]  A set of ajax parameters.
+ * @returns {Promise}
  */
 function pingP(url, options) {
     options = options || {};
-    /** @type {?} */
     const ajaxParams = tools.extend({ url: url }, options);
     return $.ajax(ajaxParams);
 }
 /**
  * Reads a the response from a given url and
  * parses it into a jquery object.
- * @param {?} url
- * @return {?}
+ * @function loadHtmlP
+ * @param {String} url
+ * @returns {Promise}
  */
 function loadHtmlP(url) {
     return $.ajax({
@@ -518,28 +410,17 @@ function loadHtmlP(url) {
         dataType: 'html text'
     }).then(function (data) {
         /*global DOMParser */
-        /** @type {?} */
         const doc = new DOMParser().parseFromString(data, 'text/html');
         return $(doc);
     });
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- */
 class MemoryBackend {
     constructor() {
         this._store = {};
     }
     /**
      * Sets a key-value pair
-     * @param {?} key
-     * @param {?} value
-     * @return {?}
      */
     set(key, value) {
         this._store[key] = value;
@@ -547,35 +428,26 @@ class MemoryBackend {
     }
     /**
      * Gets the value for a given key.
-     * @param {?} key
-     * @return {?}
      */
     get(key) {
         return this._store[key] || null;
     }
     /**
      * Removes the given key and its corresponding value.
-     * @param {?} key
-     * @return {?}
      */
     remove(key) {
         delete this._store[key];
     }
     /**
      * Returns the number of stored items.
-     * @param {?} key
-     * @return {?}
      */
     length(key) {
         return Object.keys(this._store).length;
     }
     /**
      * Retuns the ith key in the store table.
-     * @param {?} index
-     * @return {?}
      */
     key(index) {
-        /** @type {?} */
         const keys = Object.keys(this._store);
         if (index >= 0 && index < keys.length) {
             return keys[index];
@@ -585,26 +457,20 @@ class MemoryBackend {
     /**
      * Returns if this storage is enabled.
      * This method is required by locachejs.
-     * @return {?}
      */
     enabled() {
         return true;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const EventDispatcher$1 = EventDispatcher;
-/** @type {?} */
+//
+const EventDispatcher = EventDispatcher$1;
 const getEventDispatcher = function (obj) {
     if (!obj._eventDispatcher) {
-        obj._eventDispatcher = new EventDispatcher$1({
+        obj._eventDispatcher = new EventDispatcher({
             scope: obj,
             toggleEvent: function (name, state) {
-                if (EventDispatcher$1.isNative(name) && obj.toggleNativeEvent) {
+                if (EventDispatcher.isNative(name) && obj.toggleNativeEvent) {
                     obj.toggleNativeEvent(name, state);
                 }
             }
@@ -612,32 +478,17 @@ const getEventDispatcher = function (obj) {
     }
     return obj._eventDispatcher;
 };
-/**
- * @template T
- * @param {?} constructor
- * @return {?}
- */
 function observableDecorator(constructor) {
     return class extends constructor {
-        /**
-         * @template U
-         * @param {?} name
-         * @param {?} evt
-         * @param {?=} bubble
-         * @return {?}
-         */
         fire(name, evt, bubble) {
-            /** @type {?} */
             const self = this;
             // Prevent all events except the remove event after the instance has been removed
             if (self.removed && name !== 'remove') {
                 return null;
             }
-            /** @type {?} */
             const newEvt = getEventDispatcher(self).fire(name, evt, bubble);
             // Bubble event up to parents
             if (bubble !== false && self.parent) {
-                /** @type {?} */
                 let parent = self.parent();
                 while (parent && !newEvt.isPropagationStopped()) {
                     parent.fire(name, newEvt, false);
@@ -646,78 +497,37 @@ function observableDecorator(constructor) {
             }
             return newEvt;
         }
-        /**
-         * @param {?} name
-         * @param {?} callback
-         * @param {?=} prepend
-         * @return {?}
-         */
         on(name, callback, prepend) {
             return getEventDispatcher(this).on(name, callback, prepend);
         }
-        /**
-         * @param {?} name
-         * @param {?} callback
-         * @return {?}
-         */
         off(name, callback) {
             return getEventDispatcher(this).off(name, callback);
         }
-        /**
-         * @param {?} name
-         * @param {?} callback
-         * @return {?}
-         */
         once(name, callback) {
             return getEventDispatcher(this).once(name, callback);
         }
-        /**
-         * @param {?} name
-         * @return {?}
-         */
         hasEventListeners(name) {
             return getEventDispatcher(this).has(name);
         }
     };
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const locache$1 = locache;
-/** @type {?} */
-const meld$1 = meld;
-/** @type {?} */
-const originalRemove = Object.getPrototypeOf(locache$1.locache).remove;
-/** @type {?} */
+//
+const locache = locache$1;
+const meld = meld$2;
+const originalRemove = Object.getPrototypeOf(locache.locache).remove;
 const currentTime = function () {
     return new Date().getTime();
 };
-/**
- * @template T
- */
-let SlidingExpirationCache = /**
- * @template T
- */
-class SlidingExpirationCache {
-    /**
-     * @param {?} _defaultSeconds
-     * @param {?=} scheduleInterval
-     * @param {?=} ngZone
-     */
+const ɵ0 = currentTime;
+let SlidingExpirationCache = class SlidingExpirationCache {
     constructor(_defaultSeconds, scheduleInterval, ngZone) {
         this._defaultSeconds = _defaultSeconds;
-        /** @type {?} */
         const backend = new MemoryBackend();
-        this._cache = locache$1.locache.createCache({ storage: backend });
-        this._cache.remove = meld$1.around(originalRemove, (input) => {
-            /** @type {?} */
+        this._cache = locache.locache.createCache({ storage: backend });
+        this._cache.remove = meld.around(originalRemove, (input) => {
             const key = input.args[0];
-            /** @type {?} */
             const onExpireEvtName = this.onExpireEventName(key);
-            /** @type {?} */
             const event = this.asObservable.fire(onExpireEvtName, {});
             // if the event is stopped, then stop doing it
             // more time is required ...
@@ -730,7 +540,6 @@ class SlidingExpirationCache {
             this.asObservable.off(onExpireEvtName, null);
             input.proceed();
             // fire event
-            /** @type {?} */
             const afterRemoveEvtName = this.afterRemoveEventName(key);
             this.asObservable.fire(afterRemoveEvtName, {});
             return true;
@@ -754,63 +563,30 @@ class SlidingExpirationCache {
             this._timeInterval = null;
         }
     }
-    /**
-     * @private
-     * @param {?} key
-     * @return {?}
-     */
     onExpireEventName(key) {
         return 'onExpire:' + key;
     }
-    /**
-     * @private
-     * @param {?} key
-     * @return {?}
-     */
     afterRemoveEventName(key) {
         return 'afterRemove:' + key;
     }
-    /**
-     * @private
-     * @param {?} key
-     * @param {?} seconds
-     * @return {?}
-     */
     resetExpireKey(key, seconds) {
-        /** @type {?} */
         const expirekey = this._cache.expirekey(key);
-        /** @type {?} */
         const ms = seconds * 1000;
         this._cache.storage.set(expirekey, currentTime() + ms);
     }
-    /**
-     * @return {?}
-     */
     get asObservable() {
-        /** @type {?} */
         const self = this;
-        /** @type {?} */
         const observable = self;
         return observable;
     }
     // Given a key, a value and an optional number of seconds store the value
     // in the storage backend.
-    /**
-     * @param {?} key
-     * @param {?} value
-     * @param {?} seconds
-     * @param {?=} afterRemoveCallback
-     * @return {?}
-     */
     set(key, value, seconds, afterRemoveCallback) {
-        /** @type {?} */
         const expirekey = this._cache.expirekey(key);
-        /** @type {?} */
         const valueKey = this._cache.key(key);
         if (seconds) {
             // The time stored is in milliseconds, but this function expects
             // seconds, so multiply by 1000.
-            /** @type {?} */
             const ms = seconds * 1000;
             this._cache.storage.set(expirekey, currentTime() + ms);
         }
@@ -825,11 +601,6 @@ class SlidingExpirationCache {
     }
     // Fetch a value from the cache. Either returns the value, or if it
     // doesn't exist (or has expired) return null.
-    /**
-     * @param {?} key
-     * @param {?=} seconds
-     * @return {?}
-     */
     get(key, seconds) {
         // If the value has expired, before returning null remove the key
         // from the storage backend to free up the space.
@@ -838,9 +609,7 @@ class SlidingExpirationCache {
                 return null;
             }
         }
-        /** @type {?} */
         const valueKey = this._cache.key(key);
-        /** @type {?} */
         const value = this._cache.storage.get(valueKey);
         // Slide the expire ke
         if (value) {
@@ -850,33 +619,16 @@ class SlidingExpirationCache {
         // just return that.
         return value;
     }
-    /**
-     * @param {?} key
-     * @param {?} callback
-     * @return {?}
-     */
     rmOnExpireHandler(key, callback) {
         this.asObservable.off(this.onExpireEventName(key), callback);
     }
-    /**
-     * @param {?} key
-     * @param {?} callback
-     * @return {?}
-     */
     addOnExpireHandler(key, callback) {
         this.asObservable.on(this.onExpireEventName(key), callback);
     }
-    /**
-     * @return {?}
-     */
     get count() {
         return this._cache.length();
     }
-    /**
-     * @return {?}
-     */
     reset() {
-        /** @type {?} */
         const keys = this._cache.keys();
         keys.forEach((k) => {
             this.asObservable.off(this.onExpireEventName(k), null);
@@ -885,9 +637,6 @@ class SlidingExpirationCache {
         });
     }
     // must destory, or leaking ...
-    /**
-     * @return {?}
-     */
     destroy() {
         this.reset();
         if (this._timeInterval) {
@@ -895,29 +644,11 @@ class SlidingExpirationCache {
         }
     }
 };
-/**
- * @template T
- */
 SlidingExpirationCache = __decorate([
     observableDecorator,
     __metadata("design:paramtypes", [Number, Number, Object])
 ], SlidingExpirationCache);
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 const DummyOAuthTokenCtorParams = {
     url: 'dummy',
     clientId: 'dummy',
@@ -926,18 +657,11 @@ const DummyOAuthTokenCtorParams = {
 };
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * A base class for defining security plicies.
  */
-/** @type {?} */
 const _$2 = underscore;
-/**
- * @abstract
- */
 class PolicyBase {
-    /**
-     * @param {?} settings
-     */
     constructor(settings) {
         this.url = settings.url;
         this.token = '';
@@ -946,7 +670,6 @@ class PolicyBase {
      * The interface for retrieving the token from a remote server.
      * This method internally dispatches the call to another method
      * and cache the token.
-     * @return {?}
      */
     getTokenP() {
         if (!_$2.isEmpty(this.token) && !this.isExpired()) {
@@ -960,7 +683,6 @@ class PolicyBase {
     /**
      * Reset the security policy, e.g.,
      * removing established token.
-     * @return {?}
      */
     reset() {
         this.token = '';
@@ -968,15 +690,10 @@ class PolicyBase {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a base class for retrieving OAuth2 tokens.
  */
-/** @type {?} */
 const $$1 = jquery;
-/**
- * @param {?} data
- * @return {?}
- */
 function adaptToOAuthToken(data) {
     data = data || {};
     data.expiresIn = data.expiresIn || 0;
@@ -986,9 +703,6 @@ function adaptToOAuthToken(data) {
     return data;
 }
 class OAuthTokenPolicy extends PolicyBase {
-    /**
-     * @param {?} settings
-     */
     constructor(settings) {
         super(settings);
         this.clientId = settings.clientId;
@@ -997,12 +711,11 @@ class OAuthTokenPolicy extends PolicyBase {
         this.expiresIn = null;
         this.createdOn = null;
         this.refreshToken = '';
+        this.response = null;
     }
     /**
      * Feeds the policy with some settings from outside,
      * usually from local storage
-     * @param {?} settings
-     * @return {?}
      */
     readFrom(settings) {
         this.expiresIn = settings.expiresIn;
@@ -1012,7 +725,6 @@ class OAuthTokenPolicy extends PolicyBase {
     }
     /**
      * Returns the data that are persistentable.
-     * @return {?}
      */
     persistent() {
         return {
@@ -1022,9 +734,6 @@ class OAuthTokenPolicy extends PolicyBase {
             refreshToken: this.refreshToken
         };
     }
-    /**
-     * @return {?}
-     */
     getParams() {
         return {
             client_id: this.clientId,
@@ -1034,26 +743,24 @@ class OAuthTokenPolicy extends PolicyBase {
         };
     }
     // TODO: Support progress loading
-    /**
-     * @return {?}
-     */
     getTokenInternal() {
-        /** @type {?} */
         const params = this.getParams();
         return $$1.ajax({
             url: this.url,
             data: params,
             method: 'POST'
         }).then((resp) => {
+            // Put down the response
+            this.response = resp;
             this.createdOn = new Date().getTime();
             this.expiresIn = resp.expires_in;
             this.refreshToken = resp.refreshToken || '';
+            resp.scope && (this.scope = resp.scope);
             return (resp.access_token);
         });
     }
     /**
      * Returns if the token is expired or not.
-     * @return {?}
      */
     isExpired() {
         if (!this.token || this.token.length < 1) {
@@ -1062,14 +769,11 @@ class OAuthTokenPolicy extends PolicyBase {
         if (!this.createdOn) {
             return true;
         }
-        /** @type {?} */
         const expiresIn = safeParseInt(this.expiresIn);
         if (expiresIn <= 0) {
             return true;
         }
-        /** @type {?} */
         const now = new Date();
-        /** @type {?} */
         const diff = now.getTime() - this.createdOn;
         if (diff < expiresIn * 1000) {
             return false;
@@ -1078,8 +782,6 @@ class OAuthTokenPolicy extends PolicyBase {
     }
     /**
      * Applys the token to the given options.
-     * @param {?} options
-     * @return {?}
      */
     applyTo(options) {
         options.beforeSend = (xhr) => {
@@ -1088,8 +790,6 @@ class OAuthTokenPolicy extends PolicyBase {
     }
     /**
      * Apply security policy to the given options.
-     * @param {?} options
-     * @return {?}
      */
     applyToV2(options) {
         options.headers = options.headers || {};
@@ -1099,8 +799,6 @@ class OAuthTokenPolicy extends PolicyBase {
     }
     /**
      * App security policy the given options, used for our customized XHR.
-     * @param {?} options
-     * @return {?}
      */
     applyToV3(options) {
         options.requestheaders = options.requestheaders || [];
@@ -1111,7 +809,6 @@ class OAuthTokenPolicy extends PolicyBase {
     }
     /**
      * Resets the token and its assoicated information.
-     * @return {?}
      */
     reset() {
         super.reset();
@@ -1122,16 +819,11 @@ class OAuthTokenPolicy extends PolicyBase {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @param {?} data
- * @return {?}
+ * @fileOverview
+ * OpenID token policy, built upon OAuth2 token policy
  */
 function adaptToOpenIDToken(data) {
     data = data || {};
-    /** @type {?} */
     const r = adaptToOAuthToken(data);
     return Object.assign({}, r, { openId: data.openId || '' });
 }
@@ -1142,91 +834,40 @@ class OpenIDPolicy extends OAuthTokenPolicy {
     }
     /**
      * Returns the necessary information for peristence.
-     * @return {?}
      */
     persistent() {
-        /** @type {?} */
         const r = super.persistent();
         return Object.assign({}, r, { openId: this._openId });
     }
     /**
      * Reads credential from the given settings.
-     * @template THIS
-     * @this {THIS}
-     * @param {?} settings
-     * @return {THIS}
      */
     readFrom(settings) {
         super.readFrom(settings);
-        (/** @type {?} */ (this))._openId = settings.openId;
-        return (/** @type {?} */ (this));
+        this._openId = settings.openId;
+        return this;
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class NullPolicy {
-    /**
-     * @return {?}
-     */
     getTokenInternal() {
         throw new Error('NotImplemented');
     }
-    /**
-     * @param {?} options
-     * @return {?}
-     */
     applyTo(options) { }
-    /**
-     * @return {?}
-     */
     isExpired() {
         return false;
     }
-    /**
-     * @param {?} settings
-     * @return {?}
-     */
     readFrom(settings) { }
-    /**
-     * @return {?}
-     */
     persistent() { }
-    /**
-     * @param {?} options
-     * @return {?}
-     */
     applyToV2(options) { }
-    /**
-     * @param {?} options
-     * @return {?}
-     */
     applyToV3(options) { }
-    /**
-     * @return {?}
-     */
     getTokenP() {
         throw new Error('NotImplemented');
     }
-    /**
-     * @return {?}
-     */
     reset() { }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-const _$4 = underscore;
-/**
- * @param {?} a
- * @param {?} b
- * @return {?}
- */
+const _$3 = underscore;
 function isEquiva(a, b) {
     // Strict equals
     if (a === b) {
@@ -1245,7 +886,6 @@ function isEquiva(a, b) {
         if (a.length !== b.length) {
             return false;
         }
-        /** @type {?} */
         let k = a.length;
         while (k--) {
             if (!isEquiva(a[k], b[k])) {
@@ -1253,10 +893,8 @@ function isEquiva(a, b) {
             }
         }
     }
-    /** @type {?} */
     const checked = {};
-    /** @type {?} */
-    const objectB = (/** @type {?} */ (b));
+    const objectB = b;
     for (const k in objectB) {
         if (objectB.hasOwnProperty(k)) {
             if (!isEquiva(a[k], b[k])) {
@@ -1265,8 +903,7 @@ function isEquiva(a, b) {
             checked[k] = true;
         }
     }
-    /** @type {?} */
-    const objectA = (/** @type {?} */ (a));
+    const objectA = a;
     for (const k in objectA) {
         if (objectA.hasOwnProperty(k)) {
             if (!checked[k] && !isEquiva(a[k], b[k])) {
@@ -1277,35 +914,19 @@ function isEquiva(a, b) {
     return true;
 }
 // immutable
-/**
- * @template T
- */
-let UserCredential = 
-// immutable
-/**
- * @template T
- */
-class UserCredential {
+let UserCredential = class UserCredential {
     /**
-     * @param {?} authPolicy
+     * @constructor Credential
      */
     constructor(authPolicy) {
         this.authPolicy = authPolicy;
         this._user = {};
         this._security = authPolicy;
     }
-    /**
-     * @return {?}
-     */
     get asObservable() {
-        /** @type {?} */
         const self = this;
-        return (/** @type {?} */ (self));
+        return self;
     }
-    /**
-     * @param {?=} value
-     * @return {?}
-     */
     security(value) {
         if (value) {
             this._security = value;
@@ -1313,19 +934,9 @@ class UserCredential {
         return this._security;
     }
     // Does not trigger any event
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
     readFrom(data) {
-        this._user = _$4.extend(this._user, data);
+        this._user = _$3.extend(this._user, data);
     }
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
     setUser(data) {
         if (isEquiva(this._user, data)) {
             return;
@@ -1335,99 +946,56 @@ class UserCredential {
             data: this._user
         });
     }
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
     extendUser(data) {
-        /** @type {?} */
-        const newData = _$4.extend({}, this._user, data);
+        const newData = _$3.extend({}, this._user, data);
         this.setUser(newData);
     }
-    /**
-     * @template U
-     * @return {?}
-     */
     getUser() {
-        return _$4.extend({}, this._user);
+        return _$3.extend({}, this._user);
     }
-    /**
-     * @template U
-     * @param {?} handler
-     * @param {?=} likeBehaviorSubject
-     * @return {?}
-     */
     subscribe(handler, likeBehaviorSubject = false) {
         this.asObservable.on('change:user', handler);
         if (likeBehaviorSubject) {
-            /** @type {?} */
             const newEvt = { data: this._user };
-            handler((/** @type {?} */ (newEvt)));
+            handler(newEvt);
         }
     }
-    /**
-     * @param {?} handler
-     * @return {?}
-     */
     unSubscribe(handler) {
         this.asObservable.off('change:user', handler);
     }
-    /**
-     * @return {?}
-     */
     isUserKnown() {
         return !!(this._user && this._user.username);
     }
-    /**
-     * @return {?}
-     */
     isAuthenticated() {
         return this.authPolicy && !this.authPolicy.isExpired();
     }
 };
-// immutable
-/**
- * @template T
- */
 UserCredential = __decorate([
     observableDecorator,
     __metadata("design:paramtypes", [Object])
 ], UserCredential);
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides the anti-forgery security policy.
+ * @name AntiForgeryKeyPolicy.js
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
 const $$2 = jquery;
-/** @type {?} */
 const defaultAntiForgeryKey = '__RequestVerificationToken';
-/** @type {?} */
 const defaultElementTag = '';
 /*
  <input name="__RequestVerificationToken" type="hidden"
  value="J8kl6w7KaBAteKOPeHW1IlG9RS7abCkbvQf2GwBlMVZZOX9FF-Bhc5mYmqXw4qe0MLraucQtKC-TAVh1rJEZ0SDfeLfqp-L5JrthIM9V0gp76-jnVz9J-rdYFhVeTT4Y0">
  */
-/**
- * @param {?} url
- * @param {?} elementTag
- * @param {?} inputField
- * @return {?}
- */
 function getTokenInternal(url, elementTag, inputField) {
     return $$2.ajax({
         url: url,
-        // A page containing required tokens
         dataType: 'html text'
     }).then(function (data) {
         /*global DOMParser */
-        /** @type {?} */
-        let doc;
-        /** @type {?} */
-        let token;
-        /** @type {?} */
-        let elm;
+        let doc, token, elm;
         token = '';
         doc = new DOMParser().parseFromString(data, 'text/html');
         if (elementTag) {
@@ -1452,7 +1020,8 @@ function getTokenInternal(url, elementTag, inputField) {
 }
 class AntiForgeryKeyPolicy extends PolicyBase {
     /**
-     * @param {?} settings
+     * @constructor AntiForgeryKeyPolicy
+     * @param {Object} [settings] A set of settings.
      */
     constructor(settings) {
         super(settings);
@@ -1461,30 +1030,26 @@ class AntiForgeryKeyPolicy extends PolicyBase {
         this._elementTag = settings.elementTag || defaultElementTag;
         this._expired = true;
     }
-    /**
-     * @return {?}
-     */
     isExpired() {
         return this._expired;
     }
-    /**
-     * @return {?}
-     */
     inputField() {
         return 'input[name="' + this._antiForgeryKey + '"]';
     }
     /**
      * Feeds the policy with some settings from outside,
      * usually from local storage
-     * @param {?} settings
-     * @return {?}
+     * @function readFrom
+     * @param {Object} settings
+     * @returns {Object}
      */
     readFrom(settings) {
         this.token = settings.token;
     }
     /**
      * Returns the object that are persistentable.
-     * @return {?}
+     * @function persistent
+     * @returns {Object}
      */
     persistent() {
         return {
@@ -1494,17 +1059,16 @@ class AntiForgeryKeyPolicy extends PolicyBase {
     /**
      * Gets the anti-forgery token from the given url
      * or the instance url.
+     * @function getTokenP
+     * @param {String}[url] The URL where the response from it may contain
      * the anti-forgery token; it is optional and used when you want to
      * overwrite the instance url.
+     * @returns {Promise}
      * @throws {}
-     * @return {?}
      */
     getTokenInternal() {
-        /** @type {?} */
         const ret = getTokenInternal(this.url, this._elementTag, this.inputField());
-        /** @type {?} */
         const p = liftWithGuard(ret, function (token) {
-            /** @type {?} */
             const isGoodToken = token && token.length > 0;
             this._expired = !isGoodToken;
             return isGoodToken;
@@ -1513,33 +1077,28 @@ class AntiForgeryKeyPolicy extends PolicyBase {
     }
     /**
      * Applys the anti-forgery key and its value to the given options.
-     * @param {?} options
-     * @return {?}
+     * @function apply
+     * @param {Object} options The options to be used for making a request.
      */
     applyTo(options) {
-        /** @type {?} */
         const data = options.data;
         data[this._antiForgeryKey] = this.token;
     }
     /**
      * Apply security policy to the given options.
-     * @param {?} options
-     * @return {?}
+     * @function applyToV2
+     * @param {Object} options A params field is expected.
      */
     applyToV2(options) {
         options.params = options.params || {};
         options.params[this._antiForgeryKey] = this.token;
     }
     // TODO:
-    /**
-     * @param {?} options
-     * @return {?}
-     */
     applyToV3(options) {
     }
     /**
      * Resets the token and expired flag
-     * @return {?}
+     * @function reset
      */
     reset() {
         super.reset();
@@ -1547,58 +1106,26 @@ class AntiForgeryKeyPolicy extends PolicyBase {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 class OAuthTokenExtPolicy extends OAuthTokenPolicy {
-    /**
-     * @param {?} settings
-     * @param {?} payload
-     */
     constructor(settings, payload) {
         super(settings);
         this._payload = Object.assign({}, payload);
     }
-    /**
-     * @return {?}
-     */
     get payload() {
         return this._payload;
     }
     // override
-    /**
-     * @return {?}
-     */
     getParams() {
-        /** @type {?} */
         const p = super.getParams();
         return Object.assign({}, p, this._payload);
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- * @param {?} state
- * @param {?} action
- * @return {?}
- */
 function reducer(state, action) {
     switch (action.type) {
         case 'ADD': {
-            /** @type {?} */
             const payload = action.payload.filter(x => {
                 // Look for it in the current list
-                /** @type {?} */
                 const index = state.items.findIndex((y) => {
                     return x.id === y.id;
                 });
@@ -1610,9 +1137,7 @@ function reducer(state, action) {
                 ] });
         }
         case 'REMOVE': {
-            /** @type {?} */
             const newItems = state.items.filter(x => {
-                /** @type {?} */
                 const index = action.payload.findIndex((y) => {
                     return x.id === y.id;
                 });
@@ -1629,14 +1154,6 @@ function reducer(state, action) {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- * @return {?}
- */
 function buildInitialState() {
     return {
         collection: {
@@ -1644,20 +1161,12 @@ function buildInitialState() {
         }
     };
 }
-/**
- * @template T
- * @return {?}
- */
 function buildReducerMap() {
     return {
         collection: reducer
     };
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 // Store
 /*
     ReducerManager,
@@ -1697,64 +1206,29 @@ function buildReducerMap() {
    MataReducerFactory
 
 */
-/**
- * @template T
- * @return {?}
- */
 function factory() {
-    /** @type {?} */
     const actionSubject = new ActionsSubject();
-    /** @type {?} */
     const scannerActionSubject = new ScannedActionsSubject();
-    /** @type {?} */
     const actionReducerFactory = combineReducers;
-    /** @type {?} */
     const reducerManager = new ReducerManager(actionSubject, buildInitialState(), buildReducerMap(), actionReducerFactory);
-    /** @type {?} */
     const stateObservable = new State(actionSubject, reducerManager, scannerActionSubject, buildInitialState());
-    /** @type {?} */
     const store = new Store(stateObservable, actionSubject, reducerManager);
     return store;
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @abstract
- * @template T
- */
 class CollectionAbstractStore {
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     add(payload) {
         this.getStore().dispatch({
             type: 'ADD',
             payload: payload
         });
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     remove(payload) {
         this.getStore().dispatch({
             type: 'REMOVE',
             payload: payload
         });
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
     modify(payload) {
         this.getStore().dispatch({
             type: 'MODIFY',
@@ -1763,59 +1237,41 @@ class CollectionAbstractStore {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- */
-class CollectionStore extends CollectionAbstractStore {
+let CollectionStore = class CollectionStore extends CollectionAbstractStore {
     constructor() {
         super();
         this._store = factory();
     }
-    /**
-     * @return {?}
-     */
     getStore() {
         return this._store;
     }
-    /**
-     * @return {?}
-     */
     getState() {
         return this._store.select('collection');
     }
-}
-CollectionStore.decorators = [
-    { type: Injectable }
-];
-/** @nocollapse */
-CollectionStore.ctorParameters = () => [];
+};
+CollectionStore = __decorate([
+    Injectable(),
+    __metadata("design:paramtypes", [])
+], CollectionStore);
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * An endpoint which aggregates a few other endpoints, to form a new endpoint.
+ * Note that the caller is responsible for resetting underlying data providers
+ * and even caching them.
+ * Moreover, this class does not assume any knowledge about providerGenerator.
+ * providerGenerator may generate the same thing again as again.
+ * Also note that it is the provider generator's responsibilty for
+ * preversing the state of each data provider.
  */
-/** @type {?} */
-const when$1 = when;
-/** @type {?} */
-const _$5 = underscore;
-/**
- * @param {?} collection
- * @return {?}
- */
+const when = when$1;
+const _$4 = underscore;
 function hasNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return true;
     }
     return collection.hasNextPage();
 }
-/**
- * @param {?} collection
- * @return {?}
- */
 function getNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return collection.getFirstPage();
@@ -1823,16 +1279,10 @@ function getNextPage(collection) {
     return collection.getNextPage();
 }
 class AggregateCollection {
-    /**
-     * @param {?} _providerGenerator
-     */
     constructor(_providerGenerator) {
         this._providerGenerator = _providerGenerator;
         this._workingProviders = [];
     }
-    /**
-     * @return {?}
-     */
     hasNextPage() {
         // Case 1: The first time we request, we always have something.
         if (this._workingProviders.length === 0) {
@@ -1841,74 +1291,55 @@ class AggregateCollection {
         if (this._providerGenerator.hasMore()) {
             return true;
         }
-        return _$5.some(this._workingProviders, function (elem) {
+        return _$4.some(this._workingProviders, function (elem) {
             return elem.hasNextPage();
         });
     }
-    /**
-     * @return {?}
-     */
     getFirstPage() {
         // Generate providers
         return this._providerGenerator.getNext()
             .then((providers) => {
-            providers = _$5.filter(providers, function (p) {
+            providers = _$4.filter(providers, function (p) {
                 return hasNextPage(p);
             });
             return providers;
         })
             .then((providers) => {
             this._workingProviders.length = 0;
-            /** @type {?} */
-            const promises = _$5.map(providers, function (p) {
+            const promises = _$4.map(providers, function (p) {
                 return getNextPage(p)
                     .then((resp) => {
                     this._workingProviders.push(p);
                     return resp;
                 });
             });
-            return when$1.settle(promises);
+            return when.settle(promises);
         });
     }
-    /**
-     * @return {?}
-     */
     getNextPage() {
         return this.getFirstPage();
     }
-    /**
-     * @return {?}
-     */
     reset() {
         this._providerGenerator.reset();
         this._workingProviders = [];
     }
-    /**
-     * @param {?} func
-     * @return {?}
-     */
     forEach(func) {
         this._workingProviders.forEach((p) => {
             p.forEach(func);
         });
     }
-    /**
-     * @param {?} id
-     * @return {?}
-     */
     get(id) {
         // TODO:
     }
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * A decorator to Backbone. It tracks all sync events of the Backbone
+ * in a nonintrusive manner.
  */
-/** @type {?} */
-const backbone$3 = backbone;
-/** @type {?} */
-const meld$2 = meld;
+const backbone$2 = backbone$4;
+const meld$1 = meld$2;
 /**
  * The callback for the sync event.
  * @callback EventHubcallback
@@ -1919,16 +1350,14 @@ const meld$2 = meld;
  */
 /**
  * Sets up a callback for listening to the sync events from Backbone.
+ * @function mountSyncListener
+ * @param {EventHubcallback} callback
  * @throws {Error}
- * @param {?} callback
- * @return {?}
  */
 function mountSyncListener(callback) {
     // Collection
-    /** @type {?} */
-    const remover1 = meld$2.before(backbone$3.Collection.prototype, 'trigger', callback);
-    /** @type {?} */
-    const remover2 = meld$2.before(backbone$3.Model.prototype, 'trigger', callback);
+    const remover1 = meld$1.before(backbone$2.Collection.prototype, 'trigger', callback);
+    const remover2 = meld$1.before(backbone$2.Model.prototype, 'trigger', callback);
     return [remover1, remover2];
 }
 /**
@@ -1940,11 +1369,11 @@ function mountSyncListener(callback) {
  */
 /**
  * Sets up a pre-sync callback.
- * @param {?} callback
- * @return {?}
+ * @function mountSyncBeforeAdvice
+ * @param {EventHubsyncSignature} callback
  */
 function mountSyncBeforeAdvice(callback) {
-    return meld$2.before(backbone$3, 'sync', callback);
+    return meld$1.before(backbone$2, 'sync', callback);
 }
 /**
  * The signature for the around advice.
@@ -1953,34 +1382,33 @@ function mountSyncBeforeAdvice(callback) {
  */
 /**
  * Sets up an around advice.
- * @param {?} callback
- * @return {?}
+ * @function mountSyncAroundAdvice
+ * @param {EventHubaroundAdviceSignature} callback
  */
 function mountSyncAroundAdvice(callback) {
-    return meld$2.around(backbone$3, 'sync', callback);
+    return meld$1.around(backbone$2, 'sync', callback);
 }
 /**
  * Sets up a pre-ajax callback.
- * @param {?} callback
- * @return {?}
+ * @function mountAjaxBeforeAdvice
+ * @param {Function} callback
  */
 function mountAjaxBeforeAdvice(callback) {
-    return meld$2.before(backbone$3, 'ajax', callback);
+    return meld$1.before(backbone$2, 'ajax', callback);
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides a layer of backend service abstraction.
+ * Defines the backend services. This class is built onto the backbone js, but with
+ * enhanced abilities of managing the dependency among all services of the backend,
+ * and caching some type of objects for a period of time.
  */
-/** @type {?} */
 const DataFlow = dataflow;
-/** @type {?} */
-const backbone$4 = backbone;
-/** @type {?} */
-const _$6 = underscore;
+const backbone$3 = backbone$4;
+const _$5 = underscore;
 /**
  * The endpoint types for a backend service.
- * @type {?}
  */
 const endPointEnum = {
     model: 1,
@@ -1989,7 +1417,6 @@ const endPointEnum = {
 };
 /**
  * The sync types defined in the backbone js.
- * @type {?}
  */
 const syncMethodEnum = {
     /**
@@ -2007,40 +1434,32 @@ const syncMethodEnum = {
      */
     delete: 'delete'
 };
-/** @type {?} */
 const globalConfigurationMapping = {};
-/** @type {?} */
 const mountedFeatureRemovers = [];
 // Idempotent
 // Instance once ...
-/**
- * @return {?}
- */
 function mountFeatures() {
     if (mountedFeatureRemovers.length > 0) {
         return;
     }
     /*jslint unparam: true */
     /*
-          eventHub.mountSyncListener(function (method, model, response, options) {
-          // Ignore other method
-          if (method !== 'sync') {
-          return;
-          }
-          if (options.endPointKey && options.methodKey) {
-          var dataflow = self._dataflow,
-          key = options.endPointKey + ':' + options.methodKey;
-          dataflow[key] = dataflow[key] + 1;
-          }
-          }); */
-    /** @type {?} */
+      eventHub.mountSyncListener(function (method, model, response, options) {
+      // Ignore other method
+      if (method !== 'sync') {
+      return;
+      }
+      if (options.endPointKey && options.methodKey) {
+      var dataflow = self._dataflow,
+      key = options.endPointKey + ':' + options.methodKey;
+      dataflow[key] = dataflow[key] + 1;
+      }
+      }); */
     let remover = mountSyncBeforeAdvice(function (method, model, options) {
         options.methodKey = method;
         options.endPointKey = model.endPointKey || (model.collection ? model.collection.endPointKey : null);
         if (options.endPointKey) {
-            /** @type {?} */
             const cfg = globalConfigurationMapping[options.endPointKey];
-            /** @type {?} */
             const cfgOptions = cfg.options;
             if (method === 'delete') {
                 if (cfgOptions.deleteUrl) {
@@ -2079,19 +1498,15 @@ function mountFeatures() {
     mountedFeatureRemovers.push(remover);
     remover = mountAjaxBeforeAdvice(function (options) {
         if (options.endPointKey) {
-            /** @type {?} */
             const cfg = globalConfigurationMapping[options.endPointKey];
-            /** @type {?} */
             const cfgOptions = cfg.options;
-            /** @type {?} */
             const policyDelegate = cfgOptions.securityDelegate;
-            /** @type {?} */
             const extraParams = cfgOptions.extraParams;
             if (cfgOptions.contentType === 'application/x-www-form-urlencoded' &&
                 options.contentType === 'application/json') {
                 options.data = JSON.parse(options.data);
                 if (extraParams) {
-                    _$6.extend(options.data, extraParams);
+                    _$5.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -2101,7 +1516,7 @@ function mountFeatures() {
             }
             else {
                 if (extraParams) {
-                    _$6.extend(options.data, extraParams);
+                    _$5.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -2114,15 +1529,11 @@ function mountFeatures() {
     });
     mountedFeatureRemovers.push(remover);
     remover = mountSyncAroundAdvice(function (jointpoint) {
-        /** @type {?} */
         const options = jointpoint.args[2];
         if (options.endPointKey) {
-            /** @type {?} */
             const cfg = globalConfigurationMapping[options.endPointKey];
-            /** @type {?} */
             const cfgOptions = cfg.options;
             if (cfgOptions.syncDelegate) {
-                /** @type {?} */
                 const syncDelegate = cfgOptions.syncDelegate;
                 // Return a promise
                 return syncDelegate(options.endPointKey, options, cfg, function () {
@@ -2134,12 +1545,8 @@ function mountFeatures() {
     });
     mountedFeatureRemovers.push(remover);
 }
-/** @type {?} */
 const defaultLivePeroid = 60 * 5;
 class GlobalProvider {
-    /**
-     * @param {?} ctorOptions
-     */
     constructor(ctorOptions) {
         this._cache = new SlidingExpirationCache(defaultLivePeroid);
         this._dataflow = new DataFlow();
@@ -2149,37 +1556,24 @@ class GlobalProvider {
         // Mount features
         mountFeatures();
     }
-    /**
-     * @return {?}
-     */
     get host() {
         return this._host;
     }
-    /**
-     * @return {?}
-     */
     get configurationMapping() {
         return globalConfigurationMapping;
     }
     /**
      * Defines an endpoint for a kind of service.
-     * @param {?} name
-     * @param {?} tag
-     * @param {?} options
-     * @return {?}
      */
     addEndPoint(name, tag, options) {
-        /** @type {?} */
         const cfgMapping = this.configurationMapping;
-        /** @type {?} */
-        const dataflow$$1 = this._dataflow;
-        /** @type {?} */
+        const dataflow = this._dataflow;
         const uniqueName = this._uniqueNamePrefix + name;
         if (cfgMapping[uniqueName]) {
             throw new Error('Redefined endpoint: ' + name);
         }
         cfgMapping[uniqueName] = {
-            options: _$6.extend(options, { endPointKey: uniqueName }),
+            options: _$5.extend(options, { endPointKey: uniqueName }),
             tag: tag
         };
         this._myEndPointKeys.push(uniqueName);
@@ -2188,53 +1582,42 @@ class GlobalProvider {
             for (const k in syncMethodEnum) {
                 // skip loop if the property is from prototype
                 if (syncMethodEnum.hasOwnProperty(k)) {
-                    /** @type {?} */
                     const value = syncMethodEnum[k];
-                    dataflow$$1[name + ':' + value] = 1;
+                    dataflow[name + ':' + value] = 1;
                 }
             }
         }
         else {
-            dataflow$$1[name + ':' + syncMethodEnum.read] = 1;
+            dataflow[name + ':' + syncMethodEnum.read] = 1;
         }
     }
     /**
      * Retrieves the endpoint by the given name.
-     * @param {?} name
-     * @param {?=} ignoreCache
-     * @return {?}
      */
     getEndPoint(name, ignoreCache) {
-        /** @type {?} */
         const cache = this._cache;
-        /** @type {?} */
         const uniqueName = this._uniqueNamePrefix + name;
         if (ignoreCache !== true) {
-            /** @type {?} */
             const cachedValue = cache.get(uniqueName);
             if (cachedValue) {
                 return cachedValue;
             }
         }
-        /** @type {?} */
         const cfgMapping = this.configurationMapping;
-        /** @type {?} */
         const cfg = cfgMapping[uniqueName];
         if (!cfg) {
-            /** @type {?} */
             const error = new Error('No given endpoint is defined for: ' + name);
             throw error;
         }
-        /** @type {?} */
         let value = null;
         if (cfg.tag === endPointEnum.model) {
-            value = backbone$4.Model.extend(cfg.options);
+            value = backbone$3.Model.extend(cfg.options);
         }
         else if (cfg.tag === endPointEnum.collection) {
-            value = backbone$4.Collection.extend(cfg.options);
+            value = backbone$3.Collection.extend(cfg.options);
         }
         else if (cfg.tag === endPointEnum.pagedCollection) {
-            value = backbone$4.PageableCollection.extend(cfg.options);
+            value = backbone$3.PageableCollection.extend(cfg.options);
         }
         else {
             throw new Error('Not implemented');
@@ -2246,51 +1629,35 @@ class GlobalProvider {
     }
     /**
      * Get the underlying configuration for an endpoint.
-     * @param {?} endPointKey
-     * @return {?}
      */
     getConfiguration(endPointKey) {
-        /** @type {?} */
         const uniqueName = this._uniqueNamePrefix + endPointKey;
-        /** @type {?} */
         const cfgMapping = this.configurationMapping;
         return cfgMapping[uniqueName];
     }
     /**
      * Provides the callback when some operations happen.
-     * @param {?} name
-     * @param {?} callback
-     * @return {?}
      */
     addWhenCallback(name, callback) {
-        /** @type {?} */
-        const dataflow$$1 = this._dataflow;
-        dataflow$$1.when(name, callback);
+        const dataflow = this._dataflow;
+        dataflow.when(name, callback);
     }
     /**
      * Defines the dependency.
-     * @param {?} src
-     * @param {?} dst
-     * @return {?}
      */
     addDependency(src, dst) {
-        /** @type {?} */
-        const dataflow$$1 = this._dataflow;
-        dataflow$$1.on(src, function () {
-            dataflow$$1[dst] = dataflow$$1[dst] + 1;
+        const dataflow = this._dataflow;
+        dataflow.on(src, function () {
+            dataflow[dst] = dataflow[dst] + 1;
         });
     }
     /**
      * Clean up all cached data provider
-     * @return {?}
      */
     cleanupCache() {
         // Remove what we have in cache
         this._cache.reset();
     }
-    /**
-     * @return {?}
-     */
     cleanMountedFeatures() {
         mountedFeatureRemovers.forEach(function (remover) {
             remover.remove();
@@ -2299,7 +1666,6 @@ class GlobalProvider {
     }
     /**
      * Destroy the provider to release resources
-     * @return {?}
      */
     destroy() {
         // Delete cache
@@ -2317,39 +1683,29 @@ class GlobalProvider {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides type-safety operations of manipulating LocalStorage data.
+ * @name LocalStorageUtil.js
+ * @module hypercom/storage/LocalStorageUtil
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
 // as polyfill for localstorage
 // Do NOT use the LocalStorage as there is global variable which cannot be resolved
 // and which is defined only in TINYMCE.
 // import * as localStorage from 'polpware-tinymce-tailor/src/util/LocalStorage.js';
-/** @type {?} */
 const globalLocalStorage = window.localStorage;
-/** @type {?} */
-const _$7 = underscore;
-/** @type {?} */
-const find = _$7.find;
-/** @type {?} */
-const findIndex = _$7.findIndex;
-/** @type {?} */
-const union = _$7.union;
+const _$6 = underscore, find = _$6.find, findIndex = _$6.findIndex, union = _$6.union;
 /**
  * Reads the value of an entity by its key.
- * @param {?} key
- * @param {?} ty
- * @return {?}
+ * @function getEntity
+ * @param {String} key The entity key.
+ * @param {*} ty The type of the entity value.
+ * @returns {*} The entity value.
  */
 function getEntity(key, ty) {
-    /** @type {?} */
     let data = defaultValue(ty);
     try {
-        /** @type {?} */
         let tmp = globalLocalStorage.getItem(key);
         if (tmp && tmp !== 'undefined') {
             tmp = JSON.parse(tmp);
@@ -2365,10 +1721,10 @@ function getEntity(key, ty) {
 }
 /**
  * Updates the value of an entity by its key.
- * @param {?} key
- * @param {?} data
- * @param {?=} ty
- * @return {?}
+ * @function updateEntity
+ * @param {String} key The entity key.
+ * @param {*} data The new value to be replaced with.
+ * @param {*} ty The type of the entity value.
  */
 function updateEntity(key, data, ty = null) {
     try {
@@ -2380,9 +1736,9 @@ function updateEntity(key, data, ty = null) {
 }
 /**
  * Cleans the value of an entity by its key.
- * @param {?} key
- * @param {?} ty
- * @return {?}
+ * @function cleanEntity
+ * @param {String} key The entity key.
+ * @param {*} ty The type of the entity value.
  */
 function cleanEntity(key, ty) {
     try {
@@ -2396,16 +1752,14 @@ function cleanEntity(key, ty) {
  * Inserts the given data into the value of an entity of type array.
  * Note that the inserted data should be disjoint with the current data
  * stored in this entity. Otherwise, the behavior may be undefined.
- * @param {?} key
- * @param {?} data
- * @param {?} upperBound
- * @return {?}
+ * @function insertEntities
+ * @param {String} key The entity key.
+ * @param {Array} data The value to be inserted.
+ * @param {Number} upperBound The max number of elements allows for this entity value.
  */
 function insertEntities(key, data, upperBound) {
-    /** @type {?} */
     let newData = [];
-    /** @type {?} */
-    const currentData = (/** @type {?} */ (getEntity(key, tyArray)));
+    const currentData = getEntity(key, tyArray);
     if (upperBound > 0 && currentData.length > upperBound) {
         newData = data;
     }
@@ -2416,25 +1770,23 @@ function insertEntities(key, data, upperBound) {
 }
 /**
  * Finds one element of an entity of type array.
- * @param {?} key
- * @param {?} id
- * @return {?}
+ * @function findEntityById
+ * @param {String} key The entity key.
+ * @param {Number} id The identifier value. An Id field is assumed for each element.
+ * @returns {*} The value of the found element.
  */
 function findEntityById(key, id) {
-    /** @type {?} */
-    const data = (/** @type {?} */ (getEntity(key, tyArray)));
+    const data = getEntity(key, tyArray);
     return find(data, { Id: id });
 }
 /**
  * Removes an element of an entity of type array.
- * @param {?} key
- * @param {?} id
- * @return {?}
+ * @function removeEntityById
+ * @param {String} key The entity key.
+ * @param {Number} id The identifier value for the element to be removed.
  */
 function removeEntityById(key, id) {
-    /** @type {?} */
-    const data = (/** @type {?} */ (getEntity(key, tyArray)));
-    /** @type {?} */
+    const data = getEntity(key, tyArray);
     const index = findIndex(data, { Id: id });
     if (index === -1) {
         return;
@@ -2444,14 +1796,12 @@ function removeEntityById(key, id) {
 }
 /**
  * Inserts or udpates an element of an entity of type array.
- * @param {?} key
- * @param {?} entity
- * @return {?}
+ * @function insertOrUpdateEntity
+ * @param {String} key The entity key.
+ * @param {Array} entity The new value of the entity.
  */
 function insertOrUpdateEntity(key, entity) {
-    /** @type {?} */
-    const data = (/** @type {?} */ (getEntity(key, tyArray)));
-    /** @type {?} */
+    const data = getEntity(key, tyArray);
     const index = findIndex(data, { Id: entity.Id });
     if (index !== -1) {
         data[index] = entity;
@@ -2463,11 +1813,11 @@ function insertOrUpdateEntity(key, entity) {
 }
 /**
  * Removes a group of entities by a given prefix.
- * @param {?} prefix
- * @return {?}
+ * @function cleanEntityGroup
+ * @param {String} prefix The prefix of the keys of the entities to be removed. We organize entities somewhat hirarchly.
+ * @returns {Boolean}
  */
 function cleanEntityGroup(prefix) {
-    /** @type {?} */
     const keys = [];
     for (const p in globalLocalStorage) {
         if (globalLocalStorage.hasOwnProperty(p) &&
@@ -2485,26 +1835,35 @@ function cleanEntityGroup(prefix) {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Encapsulates the local storage service into one
+ * providing prmoise-aware services.
+ * @name LocalStorageTable.js
+ * @module hypercom/storage/LocalStorageTable
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
+ */
+/**
+ * @class LocalStorageTable
  */
 class LocalStorageTable {
     /**
      * Gets the value for the given key.
+     * @function getP
+     * @param {String} key The key to be searched for.
+     * @returns {Promise}
      * @throws {Error}
-     * @param {?} key
-     * @return {?}
      */
     getP(key) {
-        /** @type {?} */
         const data = getEntity(key, tyObject);
         return lift(data, null);
     }
     /**
      * Removes the key from the keychain.
+     * @function removeP
+     * @param {String} key The key to be removed.
+     * @returns {Promise}
      * @throws {Error}
-     * @param {?} key
-     * @return {?}
      */
     removeP(key) {
         cleanEntity(key, tyObject);
@@ -2512,10 +1871,10 @@ class LocalStorageTable {
     }
     /**
      * Updates the value for the given key.
+     * @param {String} key The key to be searched for.
+     * @param {Object} value The new value.
+     * @returns {Promise}
      * @throws {Error}
-     * @param {?} key
-     * @param {?} value
-     * @return {?}
      */
     updateP(key, value) {
         updateEntity(key, value, tyObject);
@@ -2524,25 +1883,20 @@ class LocalStorageTable {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides i18n service. This module is designed as
+ * a delegate of the tinymce I18n service.
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
-const _i18n = I18n;
-class I18n$1 {
-    /**
-     * @param {?} code
-     * @return {?}
-     */
+const _i18n = I18n$1;
+class I18n {
     static getDictByCode(code) {
         return _i18n.data[code];
     }
     /**
      * Add a languge dictionary and set the current
      * code as the current language.
-     * @param {?} code
-     * @param {?} items
-     * @return {?}
      */
     static add(code, items) {
         _i18n.add(code, items);
@@ -2550,12 +1904,12 @@ class I18n$1 {
     /**
      * Trnsaltes a given text. If the given text
      * is missing in the dictionary, use the given default value.
-     * @param {?} text
-     * @param {?} defaultText
-     * @return {?}
+     * @function translate
+     * @param {String} text A text to be translated.
+     * @param {String} defaultText The default value.
+     * @returns {String} The translation for the given text.
      */
     static translate(text, defaultText) {
-        /** @type {?} */
         const value = _i18n.translate(text);
         if (value === text && defaultText) {
             return defaultText;
@@ -2564,13 +1918,11 @@ class I18n$1 {
     }
     /**
      * Removes unused languages to release memory.
-     * @param {?} code
-     * @return {?}
+     * @function recycleOthers
+     * @param {String} code The language code which should not released.
      */
     static recycleOthers(code) {
-        /** @type {?} */
         const data = _i18n.data;
-        /** @type {?} */
         const recycleList = [];
         for (const key in data) {
             // skip loop if the property is from prototype
@@ -2580,7 +1932,6 @@ class I18n$1 {
         }
         /*jslint plusplus: true */
         for (let i = 0; i < recycleList.length; i++) {
-            /** @type {?} */
             const k = recycleList[i];
             delete data[k];
         }
@@ -2588,45 +1939,57 @@ class I18n$1 {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a Resources class.
+ * With this class, you may configure a bunch of resources
+ * accessible from global URIs, such as URLs.
+ * Once the requested resources are loaded, they may be
+ * cached in the memory.
+ * Note that the resources are expected to be organized in
+ * a common namespace hierarchy.
+ * E.g.,
+ * x.y.z corresponds to a json resource like:
+ *    {
+ *       y: {
+ *             z: 112
+ *          }
+ *    }
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
-const _$8 = underscore;
-/** @type {?} */
-const isString = _$8.isString;
+const _$7 = underscore;
+const isString = _$7.isString;
 /**
  * Retrieves a value from a variable by a given namespace nested structure.
- * @template T
- * @param {?} repo
- * @param {?} identifiers
- * @param {?=} startLevel
- * @return {?}
+ * @function getByNamespace
+ * @param {Object} repo
+ * @param {*} fullyQualifiedNamespace A string or an arry of string defining the namespace.
+ * @param {Number}[] startLevel
+ * @returns {*}
  */
 function getByNamespace(repo, identifiers, startLevel = 1) {
-    /** @type {?} */
     const restIdentifiers = identifiers.slice(startLevel);
-    /** @type {?} */
     const restKey = restIdentifiers.join('.');
     if (repo[restKey]) {
         return repo[restKey];
     }
-    /** @type {?} */
     let initRepo = repo;
     for (let index = startLevel; index < identifiers.length; index++) {
         if (!initRepo) {
             break;
         }
-        /** @type {?} */
         const key = identifiers[index];
         initRepo = initRepo[key];
     }
     return initRepo;
 }
+/**
+ * @class Resources
+ */
 class ResourceLoader {
     /**
      * Constructor
-     * @param {?=} _cache
+     * @function init
      */
     constructor(_cache = null) {
         this._cache = _cache;
@@ -2634,14 +1997,13 @@ class ResourceLoader {
     }
     /**
      * Configure a resource
+     * @function register
+     * @param {String} key The resource key.
+     * @param {String} uri The resource URI.
+     * @param {Number} liveSeconds The cache period.
      * @throws {Error}
-     * @param {?} key
-     * @param {?} uri
-     * @param {?=} liveSeconds
-     * @return {?}
      */
     register(key, uri, liveSeconds = 60) {
-        /** @type {?} */
         const configuration = this._configuration;
         if (configuration[key]) {
             throw new Error('Registering an existing resource key: ' + key);
@@ -2653,11 +2015,10 @@ class ResourceLoader {
     }
     /**
      * Removes a registered item
-     * @param {?} key
-     * @return {?}
+     * @function undoRegister
+     * @param {String} key The resource key to be removed.
      */
     undoRegister(key) {
-        /** @type {?} */
         const configuration = this._configuration;
         if (configuration[key]) {
             delete configuration[key];
@@ -2665,25 +2026,19 @@ class ResourceLoader {
     }
     /**
      * Returns a promise for the resource key.
+     * @function getPromise
+     * @param {String} fullyQualifiedNamespace The resource key.
+     * @returns {*} The resource value.
      * @throws {Error}
-     * @template T
-     * @param {?} fullyQualifiedNamespace
-     * @param {?} convertor
-     * @return {?}
      */
     getPromise(fullyQualifiedNamespace, convertor) {
-        /** @type {?} */
         const identifiers = fullyQualifiedNamespace.split('.');
-        /** @type {?} */
         const topIdentifier = identifiers[0];
-        /** @type {?} */
         const cache = this._cache;
         if (cache) {
             // Figure out the master key
-            /** @type {?} */
             const repo = cache.get(topIdentifier, 60);
             if (repo) {
-                /** @type {?} */
                 const value = getByNamespace(repo, identifiers);
                 if (value) {
                     // Return a promise
@@ -2691,7 +2046,6 @@ class ResourceLoader {
                 }
             }
         }
-        /** @type {?} */
         const entry = this._configuration[topIdentifier];
         if (!entry) {
             throw new Error('Get unregistered resource: ' + topIdentifier);
@@ -2709,40 +2063,8 @@ class ResourceLoader {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * Generated bundle index. Do not edit.
  */
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-export { RelationalTable, DummyRecords, RelationDatabase, sendPromise, loadJsonUriP, pingP, loadHtmlP, SlidingExpirationCache, MemoryBackend, adaptToOpenIDToken, OpenIDPolicy, PolicyBase, NullPolicy, UserCredential, AntiForgeryKeyPolicy, adaptToOAuthToken, OAuthTokenExtPolicy, OAuthTokenPolicy, DummyOAuthTokenCtorParams, observableDecorator, factory, CollectionStore, CollectionAbstractStore, reducer, buildInitialState, buildReducerMap, AggregateCollection, mountSyncListener, mountSyncBeforeAdvice, mountSyncAroundAdvice, mountAjaxBeforeAdvice, endPointEnum, syncMethodEnum, GlobalProvider, getEntity, updateEntity, cleanEntity, insertEntities, findEntityById, removeEntityById, insertOrUpdateEntity, cleanEntityGroup, LocalStorageTable, I18n$1 as I18n, ResourceLoader };
-
+export { AggregateCollection, AntiForgeryKeyPolicy, CollectionAbstractStore, CollectionStore, DummyOAuthTokenCtorParams, DummyRecords, GlobalProvider, I18n, LocalStorageTable, MemoryBackend, NullPolicy, OAuthTokenExtPolicy, OAuthTokenPolicy, OpenIDPolicy, PolicyBase, RelationDatabase, RelationalTable, ResourceLoader, SlidingExpirationCache, UserCredential, adaptToOAuthToken, adaptToOpenIDToken, buildInitialState, buildReducerMap, cleanEntity, cleanEntityGroup, endPointEnum, factory, findEntityById, getEntity, insertEntities, insertOrUpdateEntity, loadHtmlP, loadJsonUriP, mountAjaxBeforeAdvice, mountSyncAroundAdvice, mountSyncBeforeAdvice, mountSyncListener, observableDecorator, pingP, reducer, removeEntityById, sendPromise, syncMethodEnum, updateEntity, ɵ0 };
 //# sourceMappingURL=polpware-fe-data.js.map

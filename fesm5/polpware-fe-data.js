@@ -1,18 +1,16 @@
-import { ActionsSubject, ScannedActionsSubject, combineReducers, ReducerManager, State, Store } from '@ngrx/store';
-import { __assign, __extends, __spread, __decorate, __metadata } from 'tslib';
+import { underscore, backbone as backbone$4, constraintjs, XHR as XHR$1, Tools, jquery, EventDispatcher as EventDispatcher$1, locache as locache$1, meld as meld$2, when as when$1, dataflow, I18n as I18n$1 } from '@polpware/fe-dependencies';
+import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, ok, tyArray, tyObject } from '@polpware/fe-utilities';
+import { __extends, __decorate, __metadata, __assign, __spread } from 'tslib';
+import { ActionsSubject, ScannedActionsSubject, ReducerManager, State, Store, combineReducers } from '@ngrx/store';
 import { Injectable } from '@angular/core';
-import { backbone, Tools, jquery, underscore, meld, I18n, XHR, EventDispatcher, when, locache, constraintjs, dataflow } from '@polpware/fe-dependencies';
-import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, tyArray, ok, tyObject } from '@polpware/fe-utilities';
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a table in a relational database.
+ * This table is observable, i.e., any change on this table will be notified to its listeners.
  */
-/** @type {?} */
-var backbone$1 = backbone;
-/** @type {?} */
+var backbone = backbone$4;
 var _ = underscore;
-/** @type {?} */
 var cjs = constraintjs;
 var RelationalTable = /** @class */ (function () {
     function RelationalTable(options, dummyRecords) {
@@ -26,8 +24,7 @@ var RelationalTable = /** @class */ (function () {
             this._dataProvider = new options.dataProviderCtor();
         }
         else {
-            /** @type {?} */
-            var ctor = backbone$1.Collection.extend(options.dataProviderCtorOption || {});
+            var ctor = backbone.Collection.extend(options.dataProviderCtorOption || {});
             this._dataProvider = new ctor();
         }
         this._addConstraint = cjs.constraint([]);
@@ -44,83 +41,43 @@ var RelationalTable = /** @class */ (function () {
         this._deleteConstraint.onChange(this._onDeletedHandler);
     }
     Object.defineProperty(RelationalTable.prototype, "name", {
-        get: /**
-         * @return {?}
-         */
-        function () {
+        get: function () {
             return this._name;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(RelationalTable.prototype, "cascade", {
-        get: /**
-         * @return {?}
-         */
-        function () {
+        get: function () {
             return this._cascade;
         },
         enumerable: true,
         configurable: true
     });
-    /**
-     * @return {?}
-     */
-    RelationalTable.prototype.dataProvider = /**
-     * @return {?}
-     */
-    function () {
+    RelationalTable.prototype.dataProvider = function () {
         return this._dataProvider;
     };
     // TODO: Figure out ...
-    // TODO: Figure out ...
-    /**
-     * @return {?}
-     */
-    RelationalTable.prototype.onDeleted = 
-    // TODO: Figure out ...
-    /**
-     * @return {?}
-     */
-    function () {
+    RelationalTable.prototype.onDeleted = function () {
     };
     /**
      * Check if the given items are still in use.
      */
-    /**
-     * Check if the given items are still in use.
-     * @private
-     * @param {?} item
-     * @return {?}
-     */
-    RelationalTable.prototype.hasAnyReference = /**
-     * Check if the given items are still in use.
-     * @private
-     * @param {?} item
-     * @return {?}
-     */
-    function (item) {
+    RelationalTable.prototype.hasAnyReference = function (item) {
         // Check if this item is in this table or not
-        /** @type {?} */
         var itemInTable = this._dataProvider.get(item.id);
         if (!itemInTable) {
             return false;
         }
-        /** @type {?} */
         var revRelations = this._reverseForeignRelation;
-        /** @type {?} */
         var hasFound = false;
         var _loop_1 = function (revK) {
             if (revRelations.hasOwnProperty(revK)) {
-                /** @type {?} */
                 var revTables = revRelations[revK];
                 hasFound = _.some(revTables, function (fromTable) {
-                    /** @type {?} */
                     var fromTableDataProvider = fromTable.dataProvider();
-                    /** @type {?} */
                     var filter = {};
                     filter[revK] = item.id;
-                    /** @type {?} */
                     var anyUse = fromTableDataProvider.findWhere(filter);
                     return !!anyUse;
                 });
@@ -139,35 +96,17 @@ var RelationalTable = /** @class */ (function () {
     /**
      * Removing any items in other tables which depend on the deleted item.
      */
-    /**
-     * Removing any items in other tables which depend on the deleted item.
-     * @private
-     * @param {?} removedItems
-     * @return {?}
-     */
-    RelationalTable.prototype.removeReverseForeign = /**
-     * Removing any items in other tables which depend on the deleted item.
-     * @private
-     * @param {?} removedItems
-     * @return {?}
-     */
-    function (removedItems) {
-        /** @type {?} */
+    RelationalTable.prototype.removeReverseForeign = function (removedItems) {
         var revRelation = this._reverseForeignRelation;
         var _loop_2 = function (revK) {
             if (revRelation.hasOwnProperty(revK)) {
-                /** @type {?} */
                 var revTables = revRelation[revK];
                 revTables.forEach(function (reverseTable) {
-                    /** @type {?} */
                     var dataProvider = reverseTable.dataProvider();
-                    /** @type {?} */
                     var toBeRemoved = [];
                     removedItems.forEach(function (item) {
-                        /** @type {?} */
                         var filter = {};
                         filter[revK] = item.id;
-                        /** @type {?} */
                         var anyItems = dataProvider.where(filter);
                         pushArray(toBeRemoved, anyItems);
                     });
@@ -184,31 +123,10 @@ var RelationalTable = /** @class */ (function () {
     /**
      * Gets the model in the table by id.
      */
-    /**
-     * Gets the model in the table by id.
-     * @param {?} id
-     * @return {?}
-     */
-    RelationalTable.prototype.get = /**
-     * Gets the model in the table by id.
-     * @param {?} id
-     * @return {?}
-     */
-    function (id) {
+    RelationalTable.prototype.get = function (id) {
         return this._dataProvider.get(id);
     };
-    /**
-     * @private
-     * @param {?} thatItem
-     * @return {?}
-     */
-    RelationalTable.prototype.destroyFromTable = /**
-     * @private
-     * @param {?} thatItem
-     * @return {?}
-     */
-    function (thatItem) {
-        /** @type {?} */
+    RelationalTable.prototype.destroyFromTable = function (thatItem) {
         var removedItem = this._dataProvider.remove(thatItem);
         if (!removedItem) {
             return;
@@ -218,56 +136,26 @@ var RelationalTable = /** @class */ (function () {
         removedItem.trigger('destroy', removedItem);
         this.removeReverseForeign([removedItem]);
     };
-    /**
-     * @private
-     * @param {?} thatItem
-     * @param {?} foreignKey
-     * @return {?}
-     */
-    RelationalTable.prototype.getForeignModel = /**
-     * @private
-     * @param {?} thatItem
-     * @param {?} foreignKey
-     * @return {?}
-     */
-    function (thatItem, foreignKey) {
-        /** @type {?} */
+    RelationalTable.prototype.getForeignModel = function (thatItem, foreignKey) {
         var value = thatItem.attributes[foreignKey];
         // If we do not have this foreignKey, then return a dummy one
         if (!value) {
             return this.dummyRecords.getDummyRecord(foreignKey);
         }
-        /** @type {?} */
         var table = this._foreignRelation[foreignKey];
         return table.dataProvider().get(value);
     };
     /**
      * Adds an item in the Table and recursively add foreign items.
      */
-    /**
-     * Adds an item in the Table and recursively add foreign items.
-     * @param {?} model
-     * @return {?}
-     */
-    RelationalTable.prototype.add = /**
-     * Adds an item in the Table and recursively add foreign items.
-     * @param {?} model
-     * @return {?}
-     */
-    function (model) {
-        /** @type {?} */
+    RelationalTable.prototype.add = function (model) {
         var selfContext = this;
-        /** @type {?} */
         var dataProvider = this._dataProvider;
-        /** @type {?} */
         var foreignRelation = this._foreignRelation;
         // Check if the item to be added is already in this table.
-        /** @type {?} */
         var modelId = dataProvider.modelId(model);
-        /** @type {?} */
         var addedItem = dataProvider.get(modelId);
         if (addedItem) {
-            /** @type {?} */
             var newAttr = _.extend({}, addedItem.attributes, model);
             addedItem.set(newAttr);
             return addedItem;
@@ -276,17 +164,14 @@ var RelationalTable = /** @class */ (function () {
         addedItem = dataProvider.add(model);
         // Add convenient methods
         addedItem.destroyFromTable = function () {
-            /** @type {?} */
             var thatItem = this;
             selfContext.destroyFromTable(thatItem);
         };
         addedItem.getForeignModel = function (foreignKey) {
-            /** @type {?} */
             var thatItem = this;
             return selfContext.getForeignModel(thatItem, foreignKey);
         };
         addedItem.hasAnyReference = function () {
-            /** @type {?} */
             var thatItem = this;
             return selfContext.hasAnyReference(thatItem);
         };
@@ -295,17 +180,7 @@ var RelationalTable = /** @class */ (function () {
     /**
      * Add many items into a table.
      */
-    /**
-     * Add many items into a table.
-     * @param {?} models
-     * @return {?}
-     */
-    RelationalTable.prototype.addMany = /**
-     * Add many items into a table.
-     * @param {?} models
-     * @return {?}
-     */
-    function (models) {
+    RelationalTable.prototype.addMany = function (models) {
         var _this = this;
         return models.map(function (model) {
             return _this.add(model);
@@ -314,19 +189,7 @@ var RelationalTable = /** @class */ (function () {
     /**
      * Adds a foreign relation.
      */
-    /**
-     * Adds a foreign relation.
-     * @param {?} foreignKey
-     * @param {?} foreignTable
-     * @return {?}
-     */
-    RelationalTable.prototype.addForeignRelation = /**
-     * Adds a foreign relation.
-     * @param {?} foreignKey
-     * @param {?} foreignTable
-     * @return {?}
-     */
-    function (foreignKey, foreignTable) {
+    RelationalTable.prototype.addForeignRelation = function (foreignKey, foreignTable) {
         if (this._foreignRelation[foreignKey]) {
             throw new Error('Foreign key exists: ' + foreignKey);
         }
@@ -335,23 +198,9 @@ var RelationalTable = /** @class */ (function () {
     /**
      * Add a reverse foreign relation.
      */
-    /**
-     * Add a reverse foreign relation.
-     * @param {?} reverseForeignKey
-     * @param {?} table
-     * @return {?}
-     */
-    RelationalTable.prototype.addReverseForeignRelation = /**
-     * Add a reverse foreign relation.
-     * @param {?} reverseForeignKey
-     * @param {?} table
-     * @return {?}
-     */
-    function (reverseForeignKey, table) {
-        /** @type {?} */
+    RelationalTable.prototype.addReverseForeignRelation = function (reverseForeignKey, table) {
         var reverseTables = this._reverseForeignRelation[reverseForeignKey];
         if (reverseTables) {
-            /** @type {?} */
             var index = reverseTables.findIndex(function (elem) {
                 return elem === table;
             });
@@ -367,47 +216,19 @@ var RelationalTable = /** @class */ (function () {
     /**
      * Check if a given foreign relation is present.
      */
-    /**
-     * Check if a given foreign relation is present.
-     * @param {?} foreignKey
-     * @return {?}
-     */
-    RelationalTable.prototype.hasForeignRelation = /**
-     * Check if a given foreign relation is present.
-     * @param {?} foreignKey
-     * @return {?}
-     */
-    function (foreignKey) {
+    RelationalTable.prototype.hasForeignRelation = function (foreignKey) {
         return !!this._foreignRelation[foreignKey];
     };
     /**
      * Checks if a given reverse foreign relation is present.
      */
-    /**
-     * Checks if a given reverse foreign relation is present.
-     * @param {?} reverseForeignKey
-     * @return {?}
-     */
-    RelationalTable.prototype.hasReverseForeignRelation = /**
-     * Checks if a given reverse foreign relation is present.
-     * @param {?} reverseForeignKey
-     * @return {?}
-     */
-    function (reverseForeignKey) {
+    RelationalTable.prototype.hasReverseForeignRelation = function (reverseForeignKey) {
         return !!this._reverseForeignRelation[reverseForeignKey];
     };
     /**
      * Destroys table
      */
-    /**
-     * Destroys table
-     * @return {?}
-     */
-    RelationalTable.prototype.destroy = /**
-     * Destroys table
-     * @return {?}
-     */
-    function () {
+    RelationalTable.prototype.destroy = function () {
         // Remove constraint
         this._deleteConstraint.offChange(this._onDeletedHandler);
         this._dataProvider.reset();
@@ -416,26 +237,17 @@ var RelationalTable = /** @class */ (function () {
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a global dummy records for tables. Each table is configured with a dummy record.
  */
-/** @type {?} */
-var backbone$2 = backbone;
+var backbone$1 = backbone$4;
 var DummyRecords = /** @class */ (function () {
     function DummyRecords() {
         this._data = {};
     }
-    /**
-     * @param {?} key
-     * @return {?}
-     */
-    DummyRecords.prototype.getDummyRecord = /**
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    DummyRecords.prototype.getDummyRecord = function (key) {
         if (!this._data[key]) {
-            this._data[key] = new backbone$2.Model({});
+            this._data[key] = new backbone$1.Model({});
         }
         return this._data[key];
     };
@@ -443,8 +255,9 @@ var DummyRecords = /** @class */ (function () {
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a relational database which supports foreign keys and primary keys.
+ * Also this database support cascading deletion and addition.
  */
 var RelationDatabase = /** @class */ (function () {
     /**
@@ -458,15 +271,7 @@ var RelationDatabase = /** @class */ (function () {
     /**
      * Gets a reference of the file system database
      */
-    /**
-     * Gets a reference of the file system database
-     * @return {?}
-     */
-    RelationDatabase.prototype.getReference = /**
-     * Gets a reference of the file system database
-     * @return {?}
-     */
-    function () {
+    RelationDatabase.prototype.getReference = function () {
         this._referenceCounter++;
         return this;
     };
@@ -475,60 +280,24 @@ var RelationDatabase = /** @class */ (function () {
      * @function addTable
      * @param {Object} settings
      */
-    /**
-     * Defines a table in the database.
-     * @param {?} options
-     * @return {?}
-     */
-    RelationDatabase.prototype.addTable = /**
-     * Defines a table in the database.
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
+    RelationDatabase.prototype.addTable = function (options) {
         return this._tableCollection[options.name] = new RelationalTable(options, this._dummyRecords);
     };
     /**
      * Retrieves a table by name.
      */
-    /**
-     * Retrieves a table by name.
-     * @param {?} name
-     * @return {?}
-     */
-    RelationDatabase.prototype.getTable = /**
-     * Retrieves a table by name.
-     * @param {?} name
-     * @return {?}
-     */
-    function (name) {
+    RelationDatabase.prototype.getTable = function (name) {
         return this._tableCollection[name];
     };
     /**
      * Defines a foreign relation between two tables.
      */
-    /**
-     * Defines a foreign relation between two tables.
-     * @param {?} name
-     * @param {?} foreignKey
-     * @param {?} foreignName
-     * @return {?}
-     */
-    RelationDatabase.prototype.addForeignkey = /**
-     * Defines a foreign relation between two tables.
-     * @param {?} name
-     * @param {?} foreignKey
-     * @param {?} foreignName
-     * @return {?}
-     */
-    function (name, foreignKey, foreignName) {
+    RelationDatabase.prototype.addForeignkey = function (name, foreignKey, foreignName) {
         // Constraints
-        /** @type {?} */
         var table = this._tableCollection[name];
         if (!table) {
             throw new Error('Undefined table: ' + name);
         }
-        /** @type {?} */
         var foreignTable = this._tableCollection[foreignName];
         if (!foreignTable) {
             throw new Error('Undefined foreign table: ' + foreignName);
@@ -539,20 +308,11 @@ var RelationDatabase = /** @class */ (function () {
     /**
      * Destroys database
      */
-    /**
-     * Destroys database
-     * @return {?}
-     */
-    RelationDatabase.prototype.destroy = /**
-     * Destroys database
-     * @return {?}
-     */
-    function () {
+    RelationDatabase.prototype.destroy = function () {
         this._referenceCounter--;
         if (this._referenceCounter === 0) {
             for (var k in this._tableCollection) {
                 if (this._tableCollection.hasOwnProperty(k)) {
-                    /** @type {?} */
                     var table = this._tableCollection[k];
                     table.destroy();
                 }
@@ -564,19 +324,11 @@ var RelationDatabase = /** @class */ (function () {
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a class for performing XHR in an exception way and in a promise way
  */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var XHR$1 = XHR;
-/** @type {?} */
+var XHR = XHR$1;
 var _$1 = underscore;
-/** @type {?} */
 var defaultOptions = {
     async: true,
     content_type: '',
@@ -586,16 +338,9 @@ var defaultOptions = {
     error_scope: null,
     scope: null
 };
-/**
- * @param {?} options
- * @return {?}
- */
 function sendPromise(options) {
-    /** @type {?} */
     var settings = _$1.extend({}, defaultOptions, options);
-    /** @type {?} */
     var promise = new Promise(function (resolve, reject) {
-        /** @type {?} */
         var xhrSettings = {
             url: settings.url,
             content_type: settings.content_type,
@@ -629,18 +374,20 @@ function sendPromise(options) {
         else if (settings.content_type === 'application/json') {
             xhrSettings.data = JSON.stringify(xhrSettings.data);
         }
-        XHR$1.send(xhrSettings);
+        XHR.send(xhrSettings);
     });
     return promise;
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides a bunch of utilties on network communication.
+ * @name Curl.js
+ * @module hypercom/util/Curl
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
 var tools = Tools;
-/** @type {?} */
 var $ = jquery;
 /**
  * Load a local json file from the given url.
@@ -651,14 +398,13 @@ var $ = jquery;
  * In the future, we may use memory cache.
  * Also this method returns a promise compatible project, and
  * therefore, please use "then" to go future.
- * @param {?} url
- * @return {?}
+ * @function loadJsonUriP
+ * @param {String} url
+ * @returns {Promise}
  */
 function loadJsonUriP(url) {
-    /** @type {?} */
     var deferred = $.ajax({
         url: url,
-        /* 'lang/options.json', */
         cache: true,
         dataType: 'json'
     });
@@ -666,21 +412,22 @@ function loadJsonUriP(url) {
 }
 /**
  * Tests if a url is reachable.
- * @param {?} url
- * @param {?} options
- * @return {?}
+ * @function pingP
+ * @param {String} url The url to be tested.
+ * @param {Object} [options]  A set of ajax parameters.
+ * @returns {Promise}
  */
 function pingP(url, options) {
     options = options || {};
-    /** @type {?} */
     var ajaxParams = tools.extend({ url: url }, options);
     return $.ajax(ajaxParams);
 }
 /**
  * Reads a the response from a given url and
  * parses it into a jquery object.
- * @param {?} url
- * @return {?}
+ * @function loadHtmlP
+ * @param {String} url
+ * @returns {Promise}
  */
 function loadHtmlP(url) {
     return $.ajax({
@@ -688,108 +435,44 @@ function loadHtmlP(url) {
         dataType: 'html text'
     }).then(function (data) {
         /*global DOMParser */
-        /** @type {?} */
         var doc = new DOMParser().parseFromString(data, 'text/html');
         return $(doc);
     });
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- */
-var  /**
- * @template T
- */
-MemoryBackend = /** @class */ (function () {
+var MemoryBackend = /** @class */ (function () {
     function MemoryBackend() {
         this._store = {};
     }
     /**
      * Sets a key-value pair
      */
-    /**
-     * Sets a key-value pair
-     * @param {?} key
-     * @param {?} value
-     * @return {?}
-     */
-    MemoryBackend.prototype.set = /**
-     * Sets a key-value pair
-     * @param {?} key
-     * @param {?} value
-     * @return {?}
-     */
-    function (key, value) {
+    MemoryBackend.prototype.set = function (key, value) {
         this._store[key] = value;
         return value;
     };
     /**
      * Gets the value for a given key.
      */
-    /**
-     * Gets the value for a given key.
-     * @param {?} key
-     * @return {?}
-     */
-    MemoryBackend.prototype.get = /**
-     * Gets the value for a given key.
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    MemoryBackend.prototype.get = function (key) {
         return this._store[key] || null;
     };
     /**
      * Removes the given key and its corresponding value.
      */
-    /**
-     * Removes the given key and its corresponding value.
-     * @param {?} key
-     * @return {?}
-     */
-    MemoryBackend.prototype.remove = /**
-     * Removes the given key and its corresponding value.
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    MemoryBackend.prototype.remove = function (key) {
         delete this._store[key];
     };
     /**
      * Returns the number of stored items.
      */
-    /**
-     * Returns the number of stored items.
-     * @param {?} key
-     * @return {?}
-     */
-    MemoryBackend.prototype.length = /**
-     * Returns the number of stored items.
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    MemoryBackend.prototype.length = function (key) {
         return Object.keys(this._store).length;
     };
     /**
      * Retuns the ith key in the store table.
      */
-    /**
-     * Retuns the ith key in the store table.
-     * @param {?} index
-     * @return {?}
-     */
-    MemoryBackend.prototype.key = /**
-     * Retuns the ith key in the store table.
-     * @param {?} index
-     * @return {?}
-     */
-    function (index) {
-        /** @type {?} */
+    MemoryBackend.prototype.key = function (index) {
         var keys = Object.keys(this._store);
         if (index >= 0 && index < keys.length) {
             return keys[index];
@@ -800,35 +483,20 @@ MemoryBackend = /** @class */ (function () {
      * Returns if this storage is enabled.
      * This method is required by locachejs.
      */
-    /**
-     * Returns if this storage is enabled.
-     * This method is required by locachejs.
-     * @return {?}
-     */
-    MemoryBackend.prototype.enabled = /**
-     * Returns if this storage is enabled.
-     * This method is required by locachejs.
-     * @return {?}
-     */
-    function () {
+    MemoryBackend.prototype.enabled = function () {
         return true;
     };
     return MemoryBackend;
 }());
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var EventDispatcher$1 = EventDispatcher;
-/** @type {?} */
+//
+var EventDispatcher = EventDispatcher$1;
 var getEventDispatcher = function (obj) {
     if (!obj._eventDispatcher) {
-        obj._eventDispatcher = new EventDispatcher$1({
+        obj._eventDispatcher = new EventDispatcher({
             scope: obj,
             toggleEvent: function (name, state) {
-                if (EventDispatcher$1.isNative(name) && obj.toggleNativeEvent) {
+                if (EventDispatcher.isNative(name) && obj.toggleNativeEvent) {
                     obj.toggleNativeEvent(name, state);
                 }
             }
@@ -836,43 +504,21 @@ var getEventDispatcher = function (obj) {
     }
     return obj._eventDispatcher;
 };
-/**
- * @template T
- * @param {?} constructor
- * @return {?}
- */
 function observableDecorator(constructor) {
     return /** @class */ (function (_super) {
         __extends(class_1, _super);
         function class_1() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        /**
-         * @template U
-         * @param {?} name
-         * @param {?} evt
-         * @param {?=} bubble
-         * @return {?}
-         */
-        class_1.prototype.fire = /**
-         * @template U
-         * @param {?} name
-         * @param {?} evt
-         * @param {?=} bubble
-         * @return {?}
-         */
-        function (name, evt, bubble) {
-            /** @type {?} */
+        class_1.prototype.fire = function (name, evt, bubble) {
             var self = this;
             // Prevent all events except the remove event after the instance has been removed
             if (self.removed && name !== 'remove') {
                 return null;
             }
-            /** @type {?} */
             var newEvt = getEventDispatcher(self).fire(name, evt, bubble);
             // Bubble event up to parents
             if (bubble !== false && self.parent) {
-                /** @type {?} */
                 var parent_1 = self.parent();
                 while (parent_1 && !newEvt.isPropagationStopped()) {
                     parent_1.fire(name, newEvt, false);
@@ -881,92 +527,39 @@ function observableDecorator(constructor) {
             }
             return newEvt;
         };
-        /**
-         * @param {?} name
-         * @param {?} callback
-         * @param {?=} prepend
-         * @return {?}
-         */
-        class_1.prototype.on = /**
-         * @param {?} name
-         * @param {?} callback
-         * @param {?=} prepend
-         * @return {?}
-         */
-        function (name, callback, prepend) {
+        class_1.prototype.on = function (name, callback, prepend) {
             return getEventDispatcher(this).on(name, callback, prepend);
         };
-        /**
-         * @param {?} name
-         * @param {?} callback
-         * @return {?}
-         */
-        class_1.prototype.off = /**
-         * @param {?} name
-         * @param {?} callback
-         * @return {?}
-         */
-        function (name, callback) {
+        class_1.prototype.off = function (name, callback) {
             return getEventDispatcher(this).off(name, callback);
         };
-        /**
-         * @param {?} name
-         * @param {?} callback
-         * @return {?}
-         */
-        class_1.prototype.once = /**
-         * @param {?} name
-         * @param {?} callback
-         * @return {?}
-         */
-        function (name, callback) {
+        class_1.prototype.once = function (name, callback) {
             return getEventDispatcher(this).once(name, callback);
         };
-        /**
-         * @param {?} name
-         * @return {?}
-         */
-        class_1.prototype.hasEventListeners = /**
-         * @param {?} name
-         * @return {?}
-         */
-        function (name) {
+        class_1.prototype.hasEventListeners = function (name) {
             return getEventDispatcher(this).has(name);
         };
         return class_1;
     }(constructor));
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var locache$1 = locache;
-/** @type {?} */
-var meld$1 = meld;
-/** @type {?} */
-var originalRemove = Object.getPrototypeOf(locache$1.locache).remove;
-/** @type {?} */
+//
+var locache = locache$1;
+var meld = meld$2;
+var originalRemove = Object.getPrototypeOf(locache.locache).remove;
 var currentTime = function () {
     return new Date().getTime();
 };
-/**
- * @template T
- */
+var ɵ0 = currentTime;
 var SlidingExpirationCache = /** @class */ (function () {
     function SlidingExpirationCache(_defaultSeconds, scheduleInterval, ngZone) {
         var _this = this;
         this._defaultSeconds = _defaultSeconds;
-        /** @type {?} */
         var backend = new MemoryBackend();
-        this._cache = locache$1.locache.createCache({ storage: backend });
-        this._cache.remove = meld$1.around(originalRemove, function (input) {
-            /** @type {?} */
+        this._cache = locache.locache.createCache({ storage: backend });
+        this._cache.remove = meld.around(originalRemove, function (input) {
             var key = input.args[0];
-            /** @type {?} */
             var onExpireEvtName = _this.onExpireEventName(key);
-            /** @type {?} */
             var event = _this.asObservable.fire(onExpireEvtName, {});
             // if the event is stopped, then stop doing it
             // more time is required ...
@@ -979,7 +572,6 @@ var SlidingExpirationCache = /** @class */ (function () {
             _this.asObservable.off(onExpireEvtName, null);
             input.proceed();
             // fire event
-            /** @type {?} */
             var afterRemoveEvtName = _this.afterRemoveEventName(key);
             _this.asObservable.fire(afterRemoveEvtName, {});
             return true;
@@ -1003,59 +595,20 @@ var SlidingExpirationCache = /** @class */ (function () {
             this._timeInterval = null;
         }
     }
-    /**
-     * @private
-     * @param {?} key
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.onExpireEventName = /**
-     * @private
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    SlidingExpirationCache.prototype.onExpireEventName = function (key) {
         return 'onExpire:' + key;
     };
-    /**
-     * @private
-     * @param {?} key
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.afterRemoveEventName = /**
-     * @private
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    SlidingExpirationCache.prototype.afterRemoveEventName = function (key) {
         return 'afterRemove:' + key;
     };
-    /**
-     * @private
-     * @param {?} key
-     * @param {?} seconds
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.resetExpireKey = /**
-     * @private
-     * @param {?} key
-     * @param {?} seconds
-     * @return {?}
-     */
-    function (key, seconds) {
-        /** @type {?} */
+    SlidingExpirationCache.prototype.resetExpireKey = function (key, seconds) {
         var expirekey = this._cache.expirekey(key);
-        /** @type {?} */
         var ms = seconds * 1000;
         this._cache.storage.set(expirekey, currentTime() + ms);
     };
     Object.defineProperty(SlidingExpirationCache.prototype, "asObservable", {
-        get: /**
-         * @return {?}
-         */
-        function () {
-            /** @type {?} */
+        get: function () {
             var self = this;
-            /** @type {?} */
             var observable = self;
             return observable;
         },
@@ -1064,34 +617,12 @@ var SlidingExpirationCache = /** @class */ (function () {
     });
     // Given a key, a value and an optional number of seconds store the value
     // in the storage backend.
-    // Given a key, a value and an optional number of seconds store the value
-    // in the storage backend.
-    /**
-     * @param {?} key
-     * @param {?} value
-     * @param {?} seconds
-     * @param {?=} afterRemoveCallback
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.set = 
-    // Given a key, a value and an optional number of seconds store the value
-    // in the storage backend.
-    /**
-     * @param {?} key
-     * @param {?} value
-     * @param {?} seconds
-     * @param {?=} afterRemoveCallback
-     * @return {?}
-     */
-    function (key, value, seconds, afterRemoveCallback) {
-        /** @type {?} */
+    SlidingExpirationCache.prototype.set = function (key, value, seconds, afterRemoveCallback) {
         var expirekey = this._cache.expirekey(key);
-        /** @type {?} */
         var valueKey = this._cache.key(key);
         if (seconds) {
             // The time stored is in milliseconds, but this function expects
             // seconds, so multiply by 1000.
-            /** @type {?} */
             var ms = seconds * 1000;
             this._cache.storage.set(expirekey, currentTime() + ms);
         }
@@ -1106,22 +637,7 @@ var SlidingExpirationCache = /** @class */ (function () {
     };
     // Fetch a value from the cache. Either returns the value, or if it
     // doesn't exist (or has expired) return null.
-    // Fetch a value from the cache. Either returns the value, or if it
-    // doesn't exist (or has expired) return null.
-    /**
-     * @param {?} key
-     * @param {?=} seconds
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.get = 
-    // Fetch a value from the cache. Either returns the value, or if it
-    // doesn't exist (or has expired) return null.
-    /**
-     * @param {?} key
-     * @param {?=} seconds
-     * @return {?}
-     */
-    function (key, seconds) {
+    SlidingExpirationCache.prototype.get = function (key, seconds) {
         // If the value has expired, before returning null remove the key
         // from the storage backend to free up the space.
         if (this._cache.hasExpired(key)) {
@@ -1129,9 +645,7 @@ var SlidingExpirationCache = /** @class */ (function () {
                 return null;
             }
         }
-        /** @type {?} */
         var valueKey = this._cache.key(key);
-        /** @type {?} */
         var value = this._cache.storage.get(valueKey);
         // Slide the expire ke
         if (value) {
@@ -1141,51 +655,21 @@ var SlidingExpirationCache = /** @class */ (function () {
         // just return that.
         return value;
     };
-    /**
-     * @param {?} key
-     * @param {?} callback
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.rmOnExpireHandler = /**
-     * @param {?} key
-     * @param {?} callback
-     * @return {?}
-     */
-    function (key, callback) {
+    SlidingExpirationCache.prototype.rmOnExpireHandler = function (key, callback) {
         this.asObservable.off(this.onExpireEventName(key), callback);
     };
-    /**
-     * @param {?} key
-     * @param {?} callback
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.addOnExpireHandler = /**
-     * @param {?} key
-     * @param {?} callback
-     * @return {?}
-     */
-    function (key, callback) {
+    SlidingExpirationCache.prototype.addOnExpireHandler = function (key, callback) {
         this.asObservable.on(this.onExpireEventName(key), callback);
     };
     Object.defineProperty(SlidingExpirationCache.prototype, "count", {
-        get: /**
-         * @return {?}
-         */
-        function () {
+        get: function () {
             return this._cache.length();
         },
         enumerable: true,
         configurable: true
     });
-    /**
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.reset = /**
-     * @return {?}
-     */
-    function () {
+    SlidingExpirationCache.prototype.reset = function () {
         var _this = this;
-        /** @type {?} */
         var keys = this._cache.keys();
         keys.forEach(function (k) {
             _this.asObservable.off(_this.onExpireEventName(k), null);
@@ -1194,24 +678,12 @@ var SlidingExpirationCache = /** @class */ (function () {
         });
     };
     // must destory, or leaking ...
-    // must destory, or leaking ...
-    /**
-     * @return {?}
-     */
-    SlidingExpirationCache.prototype.destroy = 
-    // must destory, or leaking ...
-    /**
-     * @return {?}
-     */
-    function () {
+    SlidingExpirationCache.prototype.destroy = function () {
         this.reset();
         if (this._timeInterval) {
             clearInterval(this._timeInterval);
         }
     };
-    /**
-     * @template T
-     */
     SlidingExpirationCache = __decorate([
         observableDecorator,
         __metadata("design:paramtypes", [Number, Number, Object])
@@ -1219,21 +691,6 @@ var SlidingExpirationCache = /** @class */ (function () {
     return SlidingExpirationCache;
 }());
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 var DummyOAuthTokenCtorParams = {
     url: 'dummy',
     clientId: 'dummy',
@@ -1242,18 +699,11 @@ var DummyOAuthTokenCtorParams = {
 };
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * A base class for defining security plicies.
  */
-/** @type {?} */
 var _$2 = underscore;
-/**
- * @abstract
- */
-var  /**
- * @abstract
- */
-PolicyBase = /** @class */ (function () {
+var PolicyBase = /** @class */ (function () {
     function PolicyBase(settings) {
         this.url = settings.url;
         this.token = '';
@@ -1263,19 +713,7 @@ PolicyBase = /** @class */ (function () {
      * This method internally dispatches the call to another method
      * and cache the token.
      */
-    /**
-     * The interface for retrieving the token from a remote server.
-     * This method internally dispatches the call to another method
-     * and cache the token.
-     * @return {?}
-     */
-    PolicyBase.prototype.getTokenP = /**
-     * The interface for retrieving the token from a remote server.
-     * This method internally dispatches the call to another method
-     * and cache the token.
-     * @return {?}
-     */
-    function () {
+    PolicyBase.prototype.getTokenP = function () {
         var _this = this;
         if (!_$2.isEmpty(this.token) && !this.isExpired()) {
             return lift(this.token, null);
@@ -1289,32 +727,17 @@ PolicyBase = /** @class */ (function () {
      * Reset the security policy, e.g.,
      * removing established token.
      */
-    /**
-     * Reset the security policy, e.g.,
-     * removing established token.
-     * @return {?}
-     */
-    PolicyBase.prototype.reset = /**
-     * Reset the security policy, e.g.,
-     * removing established token.
-     * @return {?}
-     */
-    function () {
+    PolicyBase.prototype.reset = function () {
         this.token = '';
     };
     return PolicyBase;
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a base class for retrieving OAuth2 tokens.
  */
-/** @type {?} */
 var $$1 = jquery;
-/**
- * @param {?} data
- * @return {?}
- */
 function adaptToOAuthToken(data) {
     data = data || {};
     data.expiresIn = data.expiresIn || 0;
@@ -1333,25 +756,14 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
         _this.expiresIn = null;
         _this.createdOn = null;
         _this.refreshToken = '';
+        _this.response = null;
         return _this;
     }
     /**
      * Feeds the policy with some settings from outside,
      * usually from local storage
      */
-    /**
-     * Feeds the policy with some settings from outside,
-     * usually from local storage
-     * @param {?} settings
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.readFrom = /**
-     * Feeds the policy with some settings from outside,
-     * usually from local storage
-     * @param {?} settings
-     * @return {?}
-     */
-    function (settings) {
+    OAuthTokenPolicy.prototype.readFrom = function (settings) {
         this.expiresIn = settings.expiresIn;
         this.createdOn = settings.createdOn;
         this.token = settings.token;
@@ -1360,15 +772,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
     /**
      * Returns the data that are persistentable.
      */
-    /**
-     * Returns the data that are persistentable.
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.persistent = /**
-     * Returns the data that are persistentable.
-     * @return {?}
-     */
-    function () {
+    OAuthTokenPolicy.prototype.persistent = function () {
         return {
             expiresIn: this.expiresIn,
             createdOn: this.createdOn,
@@ -1376,13 +780,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
             refreshToken: this.refreshToken
         };
     };
-    /**
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.getParams = /**
-     * @return {?}
-     */
-    function () {
+    OAuthTokenPolicy.prototype.getParams = function () {
         return {
             client_id: this.clientId,
             client_secret: this.clientSecret,
@@ -1391,56 +789,38 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
         };
     };
     // TODO: Support progress loading
-    // TODO: Support progress loading
-    /**
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.getTokenInternal = 
-    // TODO: Support progress loading
-    /**
-     * @return {?}
-     */
-    function () {
+    OAuthTokenPolicy.prototype.getTokenInternal = function () {
         var _this = this;
-        /** @type {?} */
         var params = this.getParams();
         return $$1.ajax({
             url: this.url,
             data: params,
             method: 'POST'
         }).then(function (resp) {
+            // Put down the response
+            _this.response = resp;
             _this.createdOn = new Date().getTime();
             _this.expiresIn = resp.expires_in;
             _this.refreshToken = resp.refreshToken || '';
+            resp.scope && (_this.scope = resp.scope);
             return (resp.access_token);
         });
     };
     /**
      * Returns if the token is expired or not.
      */
-    /**
-     * Returns if the token is expired or not.
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.isExpired = /**
-     * Returns if the token is expired or not.
-     * @return {?}
-     */
-    function () {
+    OAuthTokenPolicy.prototype.isExpired = function () {
         if (!this.token || this.token.length < 1) {
             return true;
         }
         if (!this.createdOn) {
             return true;
         }
-        /** @type {?} */
         var expiresIn = safeParseInt(this.expiresIn);
         if (expiresIn <= 0) {
             return true;
         }
-        /** @type {?} */
         var now = new Date();
-        /** @type {?} */
         var diff = now.getTime() - this.createdOn;
         if (diff < expiresIn * 1000) {
             return false;
@@ -1450,17 +830,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
     /**
      * Applys the token to the given options.
      */
-    /**
-     * Applys the token to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.applyTo = /**
-     * Applys the token to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
+    OAuthTokenPolicy.prototype.applyTo = function (options) {
         var _this = this;
         options.beforeSend = function (xhr) {
             xhr.setRequestHeader('Authorization', ('Bearer '.concat(_this.token)));
@@ -1469,17 +839,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
     /**
      * Apply security policy to the given options.
      */
-    /**
-     * Apply security policy to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.applyToV2 = /**
-     * Apply security policy to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
+    OAuthTokenPolicy.prototype.applyToV2 = function (options) {
         options.headers = options.headers || {};
         options.headers = {
             Authorization: 'Bearer '.concat(this.token)
@@ -1488,17 +848,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
     /**
      * App security policy the given options, used for our customized XHR.
      */
-    /**
-     * App security policy the given options, used for our customized XHR.
-     * @param {?} options
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.applyToV3 = /**
-     * App security policy the given options, used for our customized XHR.
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
+    OAuthTokenPolicy.prototype.applyToV3 = function (options) {
         options.requestheaders = options.requestheaders || [];
         options.requestheaders.push({
             key: 'Authorization',
@@ -1508,15 +858,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
     /**
      * Resets the token and its assoicated information.
      */
-    /**
-     * Resets the token and its assoicated information.
-     * @return {?}
-     */
-    OAuthTokenPolicy.prototype.reset = /**
-     * Resets the token and its assoicated information.
-     * @return {?}
-     */
-    function () {
+    OAuthTokenPolicy.prototype.reset = function () {
         _super.prototype.reset.call(this);
         this.refreshToken = '';
         this.expiresIn = null;
@@ -1526,16 +868,11 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
 }(PolicyBase));
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @param {?} data
- * @return {?}
+ * @fileOverview
+ * OpenID token policy, built upon OAuth2 token policy
  */
 function adaptToOpenIDToken(data) {
     data = data || {};
-    /** @type {?} */
     var r = adaptToOAuthToken(data);
     return __assign({}, r, { openId: data.openId || '' });
 }
@@ -1549,142 +886,43 @@ var OpenIDPolicy = /** @class */ (function (_super) {
     /**
      * Returns the necessary information for peristence.
      */
-    /**
-     * Returns the necessary information for peristence.
-     * @return {?}
-     */
-    OpenIDPolicy.prototype.persistent = /**
-     * Returns the necessary information for peristence.
-     * @return {?}
-     */
-    function () {
-        /** @type {?} */
+    OpenIDPolicy.prototype.persistent = function () {
         var r = _super.prototype.persistent.call(this);
         return __assign({}, r, { openId: this._openId });
     };
     /**
      * Reads credential from the given settings.
      */
-    /**
-     * Reads credential from the given settings.
-     * @template THIS
-     * @this {THIS}
-     * @param {?} settings
-     * @return {THIS}
-     */
-    OpenIDPolicy.prototype.readFrom = /**
-     * Reads credential from the given settings.
-     * @template THIS
-     * @this {THIS}
-     * @param {?} settings
-     * @return {THIS}
-     */
-    function (settings) {
+    OpenIDPolicy.prototype.readFrom = function (settings) {
         _super.prototype.readFrom.call(this, settings);
-        (/** @type {?} */ (this))._openId = settings.openId;
-        return (/** @type {?} */ (this));
+        this._openId = settings.openId;
+        return this;
     };
     return OpenIDPolicy;
 }(OAuthTokenPolicy));
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var NullPolicy = /** @class */ (function () {
     function NullPolicy() {
     }
-    /**
-     * @return {?}
-     */
-    NullPolicy.prototype.getTokenInternal = /**
-     * @return {?}
-     */
-    function () {
+    NullPolicy.prototype.getTokenInternal = function () {
         throw new Error('NotImplemented');
     };
-    /**
-     * @param {?} options
-     * @return {?}
-     */
-    NullPolicy.prototype.applyTo = /**
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) { };
-    /**
-     * @return {?}
-     */
-    NullPolicy.prototype.isExpired = /**
-     * @return {?}
-     */
-    function () {
+    NullPolicy.prototype.applyTo = function (options) { };
+    NullPolicy.prototype.isExpired = function () {
         return false;
     };
-    /**
-     * @param {?} settings
-     * @return {?}
-     */
-    NullPolicy.prototype.readFrom = /**
-     * @param {?} settings
-     * @return {?}
-     */
-    function (settings) { };
-    /**
-     * @return {?}
-     */
-    NullPolicy.prototype.persistent = /**
-     * @return {?}
-     */
-    function () { };
-    /**
-     * @param {?} options
-     * @return {?}
-     */
-    NullPolicy.prototype.applyToV2 = /**
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) { };
-    /**
-     * @param {?} options
-     * @return {?}
-     */
-    NullPolicy.prototype.applyToV3 = /**
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) { };
-    /**
-     * @return {?}
-     */
-    NullPolicy.prototype.getTokenP = /**
-     * @return {?}
-     */
-    function () {
+    NullPolicy.prototype.readFrom = function (settings) { };
+    NullPolicy.prototype.persistent = function () { };
+    NullPolicy.prototype.applyToV2 = function (options) { };
+    NullPolicy.prototype.applyToV3 = function (options) { };
+    NullPolicy.prototype.getTokenP = function () {
         throw new Error('NotImplemented');
     };
-    /**
-     * @return {?}
-     */
-    NullPolicy.prototype.reset = /**
-     * @return {?}
-     */
-    function () { };
+    NullPolicy.prototype.reset = function () { };
     return NullPolicy;
 }());
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
-var _$4 = underscore;
-/**
- * @param {?} a
- * @param {?} b
- * @return {?}
- */
+var _$3 = underscore;
 function isEquiva(a, b) {
     // Strict equals
     if (a === b) {
@@ -1703,7 +941,6 @@ function isEquiva(a, b) {
         if (a.length !== b.length) {
             return false;
         }
-        /** @type {?} */
         var k = a.length;
         while (k--) {
             if (!isEquiva(a[k], b[k])) {
@@ -1711,10 +948,8 @@ function isEquiva(a, b) {
             }
         }
     }
-    /** @type {?} */
     var checked = {};
-    /** @type {?} */
-    var objectB = (/** @type {?} */ (b));
+    var objectB = b;
     for (var k in objectB) {
         if (objectB.hasOwnProperty(k)) {
             if (!isEquiva(a[k], b[k])) {
@@ -1723,8 +958,7 @@ function isEquiva(a, b) {
             checked[k] = true;
         }
     }
-    /** @type {?} */
-    var objectA = (/** @type {?} */ (a));
+    var objectA = a;
     for (var k in objectA) {
         if (objectA.hasOwnProperty(k)) {
             if (!checked[k] && !isEquiva(a[k], b[k])) {
@@ -1735,9 +969,6 @@ function isEquiva(a, b) {
     return true;
 }
 // immutable
-/**
- * @template T
- */
 var UserCredential = /** @class */ (function () {
     /**
      * @constructor Credential
@@ -1748,59 +979,24 @@ var UserCredential = /** @class */ (function () {
         this._security = authPolicy;
     }
     Object.defineProperty(UserCredential.prototype, "asObservable", {
-        get: /**
-         * @return {?}
-         */
-        function () {
-            /** @type {?} */
+        get: function () {
             var self = this;
-            return (/** @type {?} */ (self));
+            return self;
         },
         enumerable: true,
         configurable: true
     });
-    /**
-     * @param {?=} value
-     * @return {?}
-     */
-    UserCredential.prototype.security = /**
-     * @param {?=} value
-     * @return {?}
-     */
-    function (value) {
+    UserCredential.prototype.security = function (value) {
         if (value) {
             this._security = value;
         }
         return this._security;
     };
     // Does not trigger any event
-    // Does not trigger any event
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
-    UserCredential.prototype.readFrom = 
-    // Does not trigger any event
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
-    function (data) {
-        this._user = _$4.extend(this._user, data);
+    UserCredential.prototype.readFrom = function (data) {
+        this._user = _$3.extend(this._user, data);
     };
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
-    UserCredential.prototype.setUser = /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
-    function (data) {
+    UserCredential.prototype.setUser = function (data) {
         if (isEquiva(this._user, data)) {
             return;
         }
@@ -1809,86 +1005,30 @@ var UserCredential = /** @class */ (function () {
             data: this._user
         });
     };
-    /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
-    UserCredential.prototype.extendUser = /**
-     * @template U
-     * @param {?} data
-     * @return {?}
-     */
-    function (data) {
-        /** @type {?} */
-        var newData = _$4.extend({}, this._user, data);
+    UserCredential.prototype.extendUser = function (data) {
+        var newData = _$3.extend({}, this._user, data);
         this.setUser(newData);
     };
-    /**
-     * @template U
-     * @return {?}
-     */
-    UserCredential.prototype.getUser = /**
-     * @template U
-     * @return {?}
-     */
-    function () {
-        return _$4.extend({}, this._user);
+    UserCredential.prototype.getUser = function () {
+        return _$3.extend({}, this._user);
     };
-    /**
-     * @template U
-     * @param {?} handler
-     * @param {?=} likeBehaviorSubject
-     * @return {?}
-     */
-    UserCredential.prototype.subscribe = /**
-     * @template U
-     * @param {?} handler
-     * @param {?=} likeBehaviorSubject
-     * @return {?}
-     */
-    function (handler, likeBehaviorSubject) {
+    UserCredential.prototype.subscribe = function (handler, likeBehaviorSubject) {
         if (likeBehaviorSubject === void 0) { likeBehaviorSubject = false; }
         this.asObservable.on('change:user', handler);
         if (likeBehaviorSubject) {
-            /** @type {?} */
             var newEvt = { data: this._user };
-            handler((/** @type {?} */ (newEvt)));
+            handler(newEvt);
         }
     };
-    /**
-     * @param {?} handler
-     * @return {?}
-     */
-    UserCredential.prototype.unSubscribe = /**
-     * @param {?} handler
-     * @return {?}
-     */
-    function (handler) {
+    UserCredential.prototype.unSubscribe = function (handler) {
         this.asObservable.off('change:user', handler);
     };
-    /**
-     * @return {?}
-     */
-    UserCredential.prototype.isUserKnown = /**
-     * @return {?}
-     */
-    function () {
+    UserCredential.prototype.isUserKnown = function () {
         return !!(this._user && this._user.username);
     };
-    /**
-     * @return {?}
-     */
-    UserCredential.prototype.isAuthenticated = /**
-     * @return {?}
-     */
-    function () {
+    UserCredential.prototype.isAuthenticated = function () {
         return this.authPolicy && !this.authPolicy.isExpired();
     };
-    // immutable
-    /**
-     * @template T
-     */
     UserCredential = __decorate([
         observableDecorator,
         __metadata("design:paramtypes", [Object])
@@ -1896,39 +1036,20 @@ var UserCredential = /** @class */ (function () {
     return UserCredential;
 }());
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/** @type {?} */
 var $$2 = jquery;
-/** @type {?} */
 var defaultAntiForgeryKey = '__RequestVerificationToken';
-/** @type {?} */
 var defaultElementTag = '';
 /*
  <input name="__RequestVerificationToken" type="hidden"
  value="J8kl6w7KaBAteKOPeHW1IlG9RS7abCkbvQf2GwBlMVZZOX9FF-Bhc5mYmqXw4qe0MLraucQtKC-TAVh1rJEZ0SDfeLfqp-L5JrthIM9V0gp76-jnVz9J-rdYFhVeTT4Y0">
  */
-/**
- * @param {?} url
- * @param {?} elementTag
- * @param {?} inputField
- * @return {?}
- */
 function getTokenInternal(url, elementTag, inputField) {
     return $$2.ajax({
         url: url,
-        // A page containing required tokens
         dataType: 'html text'
     }).then(function (data) {
         /*global DOMParser */
-        /** @type {?} */
-        var doc;
-        /** @type {?} */
-        var token;
-        /** @type {?} */
-        var elm;
+        var doc, token, elm;
         token = '';
         doc = new DOMParser().parseFromString(data, 'text/html');
         if (elementTag) {
@@ -1965,22 +1086,10 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
         _this._expired = true;
         return _this;
     }
-    /**
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.isExpired = /**
-     * @return {?}
-     */
-    function () {
+    AntiForgeryKeyPolicy.prototype.isExpired = function () {
         return this._expired;
     };
-    /**
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.inputField = /**
-     * @return {?}
-     */
-    function () {
+    AntiForgeryKeyPolicy.prototype.inputField = function () {
         return 'input[name="' + this._antiForgeryKey + '"]';
     };
     /**
@@ -1990,19 +1099,7 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
      * @param {Object} settings
      * @returns {Object}
      */
-    /**
-     * Feeds the policy with some settings from outside,
-     * usually from local storage
-     * @param {?} settings
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.readFrom = /**
-     * Feeds the policy with some settings from outside,
-     * usually from local storage
-     * @param {?} settings
-     * @return {?}
-     */
-    function (settings) {
+    AntiForgeryKeyPolicy.prototype.readFrom = function (settings) {
         this.token = settings.token;
     };
     /**
@@ -2010,15 +1107,7 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
      * @function persistent
      * @returns {Object}
      */
-    /**
-     * Returns the object that are persistentable.
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.persistent = /**
-     * Returns the object that are persistentable.
-     * @return {?}
-     */
-    function () {
+    AntiForgeryKeyPolicy.prototype.persistent = function () {
         return {
             token: this.token
         };
@@ -2033,28 +1122,9 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
      * @returns {Promise}
      * @throws {}
      */
-    /**
-     * Gets the anti-forgery token from the given url
-     * or the instance url.
-     * the anti-forgery token; it is optional and used when you want to
-     * overwrite the instance url.
-     * @throws {}
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.getTokenInternal = /**
-     * Gets the anti-forgery token from the given url
-     * or the instance url.
-     * the anti-forgery token; it is optional and used when you want to
-     * overwrite the instance url.
-     * @throws {}
-     * @return {?}
-     */
-    function () {
-        /** @type {?} */
+    AntiForgeryKeyPolicy.prototype.getTokenInternal = function () {
         var ret = getTokenInternal(this.url, this._elementTag, this.inputField());
-        /** @type {?} */
         var p = liftWithGuard(ret, function (token) {
-            /** @type {?} */
             var isGoodToken = token && token.length > 0;
             this._expired = !isGoodToken;
             return isGoodToken;
@@ -2066,18 +1136,7 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
      * @function apply
      * @param {Object} options The options to be used for making a request.
      */
-    /**
-     * Applys the anti-forgery key and its value to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.applyTo = /**
-     * Applys the anti-forgery key and its value to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
-        /** @type {?} */
+    AntiForgeryKeyPolicy.prototype.applyTo = function (options) {
         var data = options.data;
         data[this._antiForgeryKey] = this.token;
     };
@@ -2086,57 +1145,24 @@ var AntiForgeryKeyPolicy = /** @class */ (function (_super) {
      * @function applyToV2
      * @param {Object} options A params field is expected.
      */
-    /**
-     * Apply security policy to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.applyToV2 = /**
-     * Apply security policy to the given options.
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
+    AntiForgeryKeyPolicy.prototype.applyToV2 = function (options) {
         options.params = options.params || {};
         options.params[this._antiForgeryKey] = this.token;
     };
     // TODO:
-    // TODO:
-    /**
-     * @param {?} options
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.applyToV3 = 
-    // TODO:
-    /**
-     * @param {?} options
-     * @return {?}
-     */
-    function (options) {
+    AntiForgeryKeyPolicy.prototype.applyToV3 = function (options) {
     };
     /**
      * Resets the token and expired flag
      * @function reset
      */
-    /**
-     * Resets the token and expired flag
-     * @return {?}
-     */
-    AntiForgeryKeyPolicy.prototype.reset = /**
-     * Resets the token and expired flag
-     * @return {?}
-     */
-    function () {
+    AntiForgeryKeyPolicy.prototype.reset = function () {
         _super.prototype.reset.call(this);
         this._expired = true;
     };
     return AntiForgeryKeyPolicy;
 }(PolicyBase));
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 var OAuthTokenExtPolicy = /** @class */ (function (_super) {
     __extends(OAuthTokenExtPolicy, _super);
     function OAuthTokenExtPolicy(settings, payload) {
@@ -2145,55 +1171,25 @@ var OAuthTokenExtPolicy = /** @class */ (function (_super) {
         return _this;
     }
     Object.defineProperty(OAuthTokenExtPolicy.prototype, "payload", {
-        get: /**
-         * @return {?}
-         */
-        function () {
+        get: function () {
             return this._payload;
         },
         enumerable: true,
         configurable: true
     });
     // override
-    // override
-    /**
-     * @return {?}
-     */
-    OAuthTokenExtPolicy.prototype.getParams = 
-    // override
-    /**
-     * @return {?}
-     */
-    function () {
-        /** @type {?} */
+    OAuthTokenExtPolicy.prototype.getParams = function () {
         var p = _super.prototype.getParams.call(this);
         return __assign({}, p, this._payload);
     };
     return OAuthTokenExtPolicy;
 }(OAuthTokenPolicy));
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- * @param {?} state
- * @param {?} action
- * @return {?}
- */
 function reducer(state, action) {
     switch (action.type) {
         case 'ADD': {
-            /** @type {?} */
             var payload = action.payload.filter(function (x) {
                 // Look for it in the current list
-                /** @type {?} */
                 var index = state.items.findIndex(function (y) {
                     return x.id === y.id;
                 });
@@ -2202,9 +1198,7 @@ function reducer(state, action) {
             return __assign({}, state, { items: __spread(state.items, payload) });
         }
         case 'REMOVE': {
-            /** @type {?} */
             var newItems = state.items.filter(function (x) {
-                /** @type {?} */
                 var index = action.payload.findIndex(function (y) {
                     return x.id === y.id;
                 });
@@ -2221,14 +1215,6 @@ function reducer(state, action) {
     }
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- * @return {?}
- */
 function buildInitialState() {
     return {
         collection: {
@@ -2236,20 +1222,12 @@ function buildInitialState() {
         }
     };
 }
-/**
- * @template T
- * @return {?}
- */
 function buildReducerMap() {
     return {
         collection: reducer
     };
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
 // Store
 /*
     ReducerManager,
@@ -2289,83 +1267,32 @@ function buildReducerMap() {
    MataReducerFactory
 
 */
-/**
- * @template T
- * @return {?}
- */
 function factory() {
-    /** @type {?} */
     var actionSubject = new ActionsSubject();
-    /** @type {?} */
     var scannerActionSubject = new ScannedActionsSubject();
-    /** @type {?} */
     var actionReducerFactory = combineReducers;
-    /** @type {?} */
     var reducerManager = new ReducerManager(actionSubject, buildInitialState(), buildReducerMap(), actionReducerFactory);
-    /** @type {?} */
     var stateObservable = new State(actionSubject, reducerManager, scannerActionSubject, buildInitialState());
-    /** @type {?} */
     var store = new Store(stateObservable, actionSubject, reducerManager);
     return store;
 }
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @abstract
- * @template T
- */
-var  /**
- * @abstract
- * @template T
- */
-CollectionAbstractStore = /** @class */ (function () {
+var CollectionAbstractStore = /** @class */ (function () {
     function CollectionAbstractStore() {
     }
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    CollectionAbstractStore.prototype.add = /**
-     * @param {?} payload
-     * @return {?}
-     */
-    function (payload) {
+    CollectionAbstractStore.prototype.add = function (payload) {
         this.getStore().dispatch({
             type: 'ADD',
             payload: payload
         });
     };
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    CollectionAbstractStore.prototype.remove = /**
-     * @param {?} payload
-     * @return {?}
-     */
-    function (payload) {
+    CollectionAbstractStore.prototype.remove = function (payload) {
         this.getStore().dispatch({
             type: 'REMOVE',
             payload: payload
         });
     };
-    /**
-     * @param {?} payload
-     * @return {?}
-     */
-    CollectionAbstractStore.prototype.modify = /**
-     * @param {?} payload
-     * @return {?}
-     */
-    function (payload) {
+    CollectionAbstractStore.prototype.modify = function (payload) {
         this.getStore().dispatch({
             type: 'MODIFY',
             payload: payload
@@ -2374,13 +1301,6 @@ CollectionAbstractStore = /** @class */ (function () {
     return CollectionAbstractStore;
 }());
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-/**
- * @template T
- */
 var CollectionStore = /** @class */ (function (_super) {
     __extends(CollectionStore, _super);
     function CollectionStore() {
@@ -2388,54 +1308,37 @@ var CollectionStore = /** @class */ (function (_super) {
         _this._store = factory();
         return _this;
     }
-    /**
-     * @return {?}
-     */
-    CollectionStore.prototype.getStore = /**
-     * @return {?}
-     */
-    function () {
+    CollectionStore.prototype.getStore = function () {
         return this._store;
     };
-    /**
-     * @return {?}
-     */
-    CollectionStore.prototype.getState = /**
-     * @return {?}
-     */
-    function () {
+    CollectionStore.prototype.getState = function () {
         return this._store.select('collection');
     };
-    CollectionStore.decorators = [
-        { type: Injectable }
-    ];
-    /** @nocollapse */
-    CollectionStore.ctorParameters = function () { return []; };
+    CollectionStore = __decorate([
+        Injectable(),
+        __metadata("design:paramtypes", [])
+    ], CollectionStore);
     return CollectionStore;
 }(CollectionAbstractStore));
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * An endpoint which aggregates a few other endpoints, to form a new endpoint.
+ * Note that the caller is responsible for resetting underlying data providers
+ * and even caching them.
+ * Moreover, this class does not assume any knowledge about providerGenerator.
+ * providerGenerator may generate the same thing again as again.
+ * Also note that it is the provider generator's responsibilty for
+ * preversing the state of each data provider.
  */
-/** @type {?} */
-var when$1 = when;
-/** @type {?} */
-var _$5 = underscore;
-/**
- * @param {?} collection
- * @return {?}
- */
+var when = when$1;
+var _$4 = underscore;
 function hasNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return true;
     }
     return collection.hasNextPage();
 }
-/**
- * @param {?} collection
- * @return {?}
- */
 function getNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return collection.getFirstPage();
@@ -2447,13 +1350,7 @@ var AggregateCollection = /** @class */ (function () {
         this._providerGenerator = _providerGenerator;
         this._workingProviders = [];
     }
-    /**
-     * @return {?}
-     */
-    AggregateCollection.prototype.hasNextPage = /**
-     * @return {?}
-     */
-    function () {
+    AggregateCollection.prototype.hasNextPage = function () {
         // Case 1: The first time we request, we always have something.
         if (this._workingProviders.length === 0) {
             return true;
@@ -2461,30 +1358,23 @@ var AggregateCollection = /** @class */ (function () {
         if (this._providerGenerator.hasMore()) {
             return true;
         }
-        return _$5.some(this._workingProviders, function (elem) {
+        return _$4.some(this._workingProviders, function (elem) {
             return elem.hasNextPage();
         });
     };
-    /**
-     * @return {?}
-     */
-    AggregateCollection.prototype.getFirstPage = /**
-     * @return {?}
-     */
-    function () {
+    AggregateCollection.prototype.getFirstPage = function () {
         var _this = this;
         // Generate providers
         return this._providerGenerator.getNext()
             .then(function (providers) {
-            providers = _$5.filter(providers, function (p) {
+            providers = _$4.filter(providers, function (p) {
                 return hasNextPage(p);
             });
             return providers;
         })
             .then(function (providers) {
             _this._workingProviders.length = 0;
-            /** @type {?} */
-            var promises = _$5.map(providers, function (p) {
+            var promises = _$4.map(providers, function (p) {
                 var _this = this;
                 return getNextPage(p)
                     .then(function (resp) {
@@ -2492,63 +1382,34 @@ var AggregateCollection = /** @class */ (function () {
                     return resp;
                 });
             });
-            return when$1.settle(promises);
+            return when.settle(promises);
         });
     };
-    /**
-     * @return {?}
-     */
-    AggregateCollection.prototype.getNextPage = /**
-     * @return {?}
-     */
-    function () {
+    AggregateCollection.prototype.getNextPage = function () {
         return this.getFirstPage();
     };
-    /**
-     * @return {?}
-     */
-    AggregateCollection.prototype.reset = /**
-     * @return {?}
-     */
-    function () {
+    AggregateCollection.prototype.reset = function () {
         this._providerGenerator.reset();
         this._workingProviders = [];
     };
-    /**
-     * @param {?} func
-     * @return {?}
-     */
-    AggregateCollection.prototype.forEach = /**
-     * @param {?} func
-     * @return {?}
-     */
-    function (func) {
+    AggregateCollection.prototype.forEach = function (func) {
         this._workingProviders.forEach(function (p) {
             p.forEach(func);
         });
     };
-    /**
-     * @param {?} id
-     * @return {?}
-     */
-    AggregateCollection.prototype.get = /**
-     * @param {?} id
-     * @return {?}
-     */
-    function (id) {
+    AggregateCollection.prototype.get = function (id) {
         // TODO:
     };
     return AggregateCollection;
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * A decorator to Backbone. It tracks all sync events of the Backbone
+ * in a nonintrusive manner.
  */
-/** @type {?} */
-var backbone$3 = backbone;
-/** @type {?} */
-var meld$2 = meld;
+var backbone$2 = backbone$4;
+var meld$1 = meld$2;
 /**
  * The callback for the sync event.
  * @callback EventHubcallback
@@ -2559,16 +1420,14 @@ var meld$2 = meld;
  */
 /**
  * Sets up a callback for listening to the sync events from Backbone.
+ * @function mountSyncListener
+ * @param {EventHubcallback} callback
  * @throws {Error}
- * @param {?} callback
- * @return {?}
  */
 function mountSyncListener(callback) {
     // Collection
-    /** @type {?} */
-    var remover1 = meld$2.before(backbone$3.Collection.prototype, 'trigger', callback);
-    /** @type {?} */
-    var remover2 = meld$2.before(backbone$3.Model.prototype, 'trigger', callback);
+    var remover1 = meld$1.before(backbone$2.Collection.prototype, 'trigger', callback);
+    var remover2 = meld$1.before(backbone$2.Model.prototype, 'trigger', callback);
     return [remover1, remover2];
 }
 /**
@@ -2580,11 +1439,11 @@ function mountSyncListener(callback) {
  */
 /**
  * Sets up a pre-sync callback.
- * @param {?} callback
- * @return {?}
+ * @function mountSyncBeforeAdvice
+ * @param {EventHubsyncSignature} callback
  */
 function mountSyncBeforeAdvice(callback) {
-    return meld$2.before(backbone$3, 'sync', callback);
+    return meld$1.before(backbone$2, 'sync', callback);
 }
 /**
  * The signature for the around advice.
@@ -2593,34 +1452,33 @@ function mountSyncBeforeAdvice(callback) {
  */
 /**
  * Sets up an around advice.
- * @param {?} callback
- * @return {?}
+ * @function mountSyncAroundAdvice
+ * @param {EventHubaroundAdviceSignature} callback
  */
 function mountSyncAroundAdvice(callback) {
-    return meld$2.around(backbone$3, 'sync', callback);
+    return meld$1.around(backbone$2, 'sync', callback);
 }
 /**
  * Sets up a pre-ajax callback.
- * @param {?} callback
- * @return {?}
+ * @function mountAjaxBeforeAdvice
+ * @param {Function} callback
  */
 function mountAjaxBeforeAdvice(callback) {
-    return meld$2.before(backbone$3, 'ajax', callback);
+    return meld$1.before(backbone$2, 'ajax', callback);
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides a layer of backend service abstraction.
+ * Defines the backend services. This class is built onto the backbone js, but with
+ * enhanced abilities of managing the dependency among all services of the backend,
+ * and caching some type of objects for a period of time.
  */
-/** @type {?} */
 var DataFlow = dataflow;
-/** @type {?} */
-var backbone$4 = backbone;
-/** @type {?} */
-var _$6 = underscore;
+var backbone$3 = backbone$4;
+var _$5 = underscore;
 /**
  * The endpoint types for a backend service.
- * @type {?}
  */
 var endPointEnum = {
     model: 1,
@@ -2629,7 +1487,6 @@ var endPointEnum = {
 };
 /**
  * The sync types defined in the backbone js.
- * @type {?}
  */
 var syncMethodEnum = {
     /**
@@ -2647,40 +1504,32 @@ var syncMethodEnum = {
      */
     delete: 'delete'
 };
-/** @type {?} */
 var globalConfigurationMapping = {};
-/** @type {?} */
 var mountedFeatureRemovers = [];
 // Idempotent
 // Instance once ...
-/**
- * @return {?}
- */
 function mountFeatures() {
     if (mountedFeatureRemovers.length > 0) {
         return;
     }
     /*jslint unparam: true */
     /*
-          eventHub.mountSyncListener(function (method, model, response, options) {
-          // Ignore other method
-          if (method !== 'sync') {
-          return;
-          }
-          if (options.endPointKey && options.methodKey) {
-          var dataflow = self._dataflow,
-          key = options.endPointKey + ':' + options.methodKey;
-          dataflow[key] = dataflow[key] + 1;
-          }
-          }); */
-    /** @type {?} */
+      eventHub.mountSyncListener(function (method, model, response, options) {
+      // Ignore other method
+      if (method !== 'sync') {
+      return;
+      }
+      if (options.endPointKey && options.methodKey) {
+      var dataflow = self._dataflow,
+      key = options.endPointKey + ':' + options.methodKey;
+      dataflow[key] = dataflow[key] + 1;
+      }
+      }); */
     var remover = mountSyncBeforeAdvice(function (method, model, options) {
         options.methodKey = method;
         options.endPointKey = model.endPointKey || (model.collection ? model.collection.endPointKey : null);
         if (options.endPointKey) {
-            /** @type {?} */
             var cfg = globalConfigurationMapping[options.endPointKey];
-            /** @type {?} */
             var cfgOptions = cfg.options;
             if (method === 'delete') {
                 if (cfgOptions.deleteUrl) {
@@ -2719,19 +1568,15 @@ function mountFeatures() {
     mountedFeatureRemovers.push(remover);
     remover = mountAjaxBeforeAdvice(function (options) {
         if (options.endPointKey) {
-            /** @type {?} */
             var cfg = globalConfigurationMapping[options.endPointKey];
-            /** @type {?} */
             var cfgOptions = cfg.options;
-            /** @type {?} */
             var policyDelegate = cfgOptions.securityDelegate;
-            /** @type {?} */
             var extraParams = cfgOptions.extraParams;
             if (cfgOptions.contentType === 'application/x-www-form-urlencoded' &&
                 options.contentType === 'application/json') {
                 options.data = JSON.parse(options.data);
                 if (extraParams) {
-                    _$6.extend(options.data, extraParams);
+                    _$5.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -2741,7 +1586,7 @@ function mountFeatures() {
             }
             else {
                 if (extraParams) {
-                    _$6.extend(options.data, extraParams);
+                    _$5.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -2754,15 +1599,11 @@ function mountFeatures() {
     });
     mountedFeatureRemovers.push(remover);
     remover = mountSyncAroundAdvice(function (jointpoint) {
-        /** @type {?} */
         var options = jointpoint.args[2];
         if (options.endPointKey) {
-            /** @type {?} */
             var cfg = globalConfigurationMapping[options.endPointKey];
-            /** @type {?} */
             var cfgOptions = cfg.options;
             if (cfgOptions.syncDelegate) {
-                /** @type {?} */
                 var syncDelegate = cfgOptions.syncDelegate;
                 // Return a promise
                 return syncDelegate(options.endPointKey, options, cfg, function () {
@@ -2774,7 +1615,6 @@ function mountFeatures() {
     });
     mountedFeatureRemovers.push(remover);
 }
-/** @type {?} */
 var defaultLivePeroid = 60 * 5;
 var GlobalProvider = /** @class */ (function () {
     function GlobalProvider(ctorOptions) {
@@ -2787,20 +1627,14 @@ var GlobalProvider = /** @class */ (function () {
         mountFeatures();
     }
     Object.defineProperty(GlobalProvider.prototype, "host", {
-        get: /**
-         * @return {?}
-         */
-        function () {
+        get: function () {
             return this._host;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(GlobalProvider.prototype, "configurationMapping", {
-        get: /**
-         * @return {?}
-         */
-        function () {
+        get: function () {
             return globalConfigurationMapping;
         },
         enumerable: true,
@@ -2809,32 +1643,15 @@ var GlobalProvider = /** @class */ (function () {
     /**
      * Defines an endpoint for a kind of service.
      */
-    /**
-     * Defines an endpoint for a kind of service.
-     * @param {?} name
-     * @param {?} tag
-     * @param {?} options
-     * @return {?}
-     */
-    GlobalProvider.prototype.addEndPoint = /**
-     * Defines an endpoint for a kind of service.
-     * @param {?} name
-     * @param {?} tag
-     * @param {?} options
-     * @return {?}
-     */
-    function (name, tag, options) {
-        /** @type {?} */
+    GlobalProvider.prototype.addEndPoint = function (name, tag, options) {
         var cfgMapping = this.configurationMapping;
-        /** @type {?} */
-        var dataflow$$1 = this._dataflow;
-        /** @type {?} */
+        var dataflow = this._dataflow;
         var uniqueName = this._uniqueNamePrefix + name;
         if (cfgMapping[uniqueName]) {
             throw new Error('Redefined endpoint: ' + name);
         }
         cfgMapping[uniqueName] = {
-            options: _$6.extend(options, { endPointKey: uniqueName }),
+            options: _$5.extend(options, { endPointKey: uniqueName }),
             tag: tag
         };
         this._myEndPointKeys.push(uniqueName);
@@ -2843,62 +1660,42 @@ var GlobalProvider = /** @class */ (function () {
             for (var k in syncMethodEnum) {
                 // skip loop if the property is from prototype
                 if (syncMethodEnum.hasOwnProperty(k)) {
-                    /** @type {?} */
                     var value = syncMethodEnum[k];
-                    dataflow$$1[name + ':' + value] = 1;
+                    dataflow[name + ':' + value] = 1;
                 }
             }
         }
         else {
-            dataflow$$1[name + ':' + syncMethodEnum.read] = 1;
+            dataflow[name + ':' + syncMethodEnum.read] = 1;
         }
     };
     /**
      * Retrieves the endpoint by the given name.
      */
-    /**
-     * Retrieves the endpoint by the given name.
-     * @param {?} name
-     * @param {?=} ignoreCache
-     * @return {?}
-     */
-    GlobalProvider.prototype.getEndPoint = /**
-     * Retrieves the endpoint by the given name.
-     * @param {?} name
-     * @param {?=} ignoreCache
-     * @return {?}
-     */
-    function (name, ignoreCache) {
-        /** @type {?} */
+    GlobalProvider.prototype.getEndPoint = function (name, ignoreCache) {
         var cache = this._cache;
-        /** @type {?} */
         var uniqueName = this._uniqueNamePrefix + name;
         if (ignoreCache !== true) {
-            /** @type {?} */
             var cachedValue = cache.get(uniqueName);
             if (cachedValue) {
                 return cachedValue;
             }
         }
-        /** @type {?} */
         var cfgMapping = this.configurationMapping;
-        /** @type {?} */
         var cfg = cfgMapping[uniqueName];
         if (!cfg) {
-            /** @type {?} */
             var error = new Error('No given endpoint is defined for: ' + name);
             throw error;
         }
-        /** @type {?} */
         var value = null;
         if (cfg.tag === endPointEnum.model) {
-            value = backbone$4.Model.extend(cfg.options);
+            value = backbone$3.Model.extend(cfg.options);
         }
         else if (cfg.tag === endPointEnum.collection) {
-            value = backbone$4.Collection.extend(cfg.options);
+            value = backbone$3.Collection.extend(cfg.options);
         }
         else if (cfg.tag === endPointEnum.pagedCollection) {
-            value = backbone$4.PageableCollection.extend(cfg.options);
+            value = backbone$3.PageableCollection.extend(cfg.options);
         }
         else {
             throw new Error('Not implemented');
@@ -2911,87 +1708,35 @@ var GlobalProvider = /** @class */ (function () {
     /**
      * Get the underlying configuration for an endpoint.
      */
-    /**
-     * Get the underlying configuration for an endpoint.
-     * @param {?} endPointKey
-     * @return {?}
-     */
-    GlobalProvider.prototype.getConfiguration = /**
-     * Get the underlying configuration for an endpoint.
-     * @param {?} endPointKey
-     * @return {?}
-     */
-    function (endPointKey) {
-        /** @type {?} */
+    GlobalProvider.prototype.getConfiguration = function (endPointKey) {
         var uniqueName = this._uniqueNamePrefix + endPointKey;
-        /** @type {?} */
         var cfgMapping = this.configurationMapping;
         return cfgMapping[uniqueName];
     };
     /**
      * Provides the callback when some operations happen.
      */
-    /**
-     * Provides the callback when some operations happen.
-     * @param {?} name
-     * @param {?} callback
-     * @return {?}
-     */
-    GlobalProvider.prototype.addWhenCallback = /**
-     * Provides the callback when some operations happen.
-     * @param {?} name
-     * @param {?} callback
-     * @return {?}
-     */
-    function (name, callback) {
-        /** @type {?} */
-        var dataflow$$1 = this._dataflow;
-        dataflow$$1.when(name, callback);
+    GlobalProvider.prototype.addWhenCallback = function (name, callback) {
+        var dataflow = this._dataflow;
+        dataflow.when(name, callback);
     };
     /**
      * Defines the dependency.
      */
-    /**
-     * Defines the dependency.
-     * @param {?} src
-     * @param {?} dst
-     * @return {?}
-     */
-    GlobalProvider.prototype.addDependency = /**
-     * Defines the dependency.
-     * @param {?} src
-     * @param {?} dst
-     * @return {?}
-     */
-    function (src, dst) {
-        /** @type {?} */
-        var dataflow$$1 = this._dataflow;
-        dataflow$$1.on(src, function () {
-            dataflow$$1[dst] = dataflow$$1[dst] + 1;
+    GlobalProvider.prototype.addDependency = function (src, dst) {
+        var dataflow = this._dataflow;
+        dataflow.on(src, function () {
+            dataflow[dst] = dataflow[dst] + 1;
         });
     };
     /**
      * Clean up all cached data provider
      */
-    /**
-     * Clean up all cached data provider
-     * @return {?}
-     */
-    GlobalProvider.prototype.cleanupCache = /**
-     * Clean up all cached data provider
-     * @return {?}
-     */
-    function () {
+    GlobalProvider.prototype.cleanupCache = function () {
         // Remove what we have in cache
         this._cache.reset();
     };
-    /**
-     * @return {?}
-     */
-    GlobalProvider.prototype.cleanMountedFeatures = /**
-     * @return {?}
-     */
-    function () {
+    GlobalProvider.prototype.cleanMountedFeatures = function () {
         mountedFeatureRemovers.forEach(function (remover) {
             remover.remove();
         });
@@ -3000,15 +1745,7 @@ var GlobalProvider = /** @class */ (function () {
     /**
      * Destroy the provider to release resources
      */
-    /**
-     * Destroy the provider to release resources
-     * @return {?}
-     */
-    GlobalProvider.prototype.destroy = /**
-     * Destroy the provider to release resources
-     * @return {?}
-     */
-    function () {
+    GlobalProvider.prototype.destroy = function () {
         // Delete cache
         this._myEndPointKeys.forEach(function (k) {
             delete globalConfigurationMapping[k];
@@ -3025,39 +1762,29 @@ var GlobalProvider = /** @class */ (function () {
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides type-safety operations of manipulating LocalStorage data.
+ * @name LocalStorageUtil.js
+ * @module hypercom/storage/LocalStorageUtil
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
 // as polyfill for localstorage
 // Do NOT use the LocalStorage as there is global variable which cannot be resolved
 // and which is defined only in TINYMCE.
 // import * as localStorage from 'polpware-tinymce-tailor/src/util/LocalStorage.js';
-/** @type {?} */
 var globalLocalStorage = window.localStorage;
-/** @type {?} */
-var _$7 = underscore;
-/** @type {?} */
-var find = _$7.find;
-/** @type {?} */
-var findIndex = _$7.findIndex;
-/** @type {?} */
-var union = _$7.union;
+var _$6 = underscore, find = _$6.find, findIndex = _$6.findIndex, union = _$6.union;
 /**
  * Reads the value of an entity by its key.
- * @param {?} key
- * @param {?} ty
- * @return {?}
+ * @function getEntity
+ * @param {String} key The entity key.
+ * @param {*} ty The type of the entity value.
+ * @returns {*} The entity value.
  */
 function getEntity(key, ty) {
-    /** @type {?} */
     var data = defaultValue(ty);
     try {
-        /** @type {?} */
         var tmp = globalLocalStorage.getItem(key);
         if (tmp && tmp !== 'undefined') {
             tmp = JSON.parse(tmp);
@@ -3073,10 +1800,10 @@ function getEntity(key, ty) {
 }
 /**
  * Updates the value of an entity by its key.
- * @param {?} key
- * @param {?} data
- * @param {?=} ty
- * @return {?}
+ * @function updateEntity
+ * @param {String} key The entity key.
+ * @param {*} data The new value to be replaced with.
+ * @param {*} ty The type of the entity value.
  */
 function updateEntity(key, data, ty) {
     if (ty === void 0) { ty = null; }
@@ -3089,9 +1816,9 @@ function updateEntity(key, data, ty) {
 }
 /**
  * Cleans the value of an entity by its key.
- * @param {?} key
- * @param {?} ty
- * @return {?}
+ * @function cleanEntity
+ * @param {String} key The entity key.
+ * @param {*} ty The type of the entity value.
  */
 function cleanEntity(key, ty) {
     try {
@@ -3105,16 +1832,14 @@ function cleanEntity(key, ty) {
  * Inserts the given data into the value of an entity of type array.
  * Note that the inserted data should be disjoint with the current data
  * stored in this entity. Otherwise, the behavior may be undefined.
- * @param {?} key
- * @param {?} data
- * @param {?} upperBound
- * @return {?}
+ * @function insertEntities
+ * @param {String} key The entity key.
+ * @param {Array} data The value to be inserted.
+ * @param {Number} upperBound The max number of elements allows for this entity value.
  */
 function insertEntities(key, data, upperBound) {
-    /** @type {?} */
     var newData = [];
-    /** @type {?} */
-    var currentData = (/** @type {?} */ (getEntity(key, tyArray)));
+    var currentData = getEntity(key, tyArray);
     if (upperBound > 0 && currentData.length > upperBound) {
         newData = data;
     }
@@ -3125,25 +1850,23 @@ function insertEntities(key, data, upperBound) {
 }
 /**
  * Finds one element of an entity of type array.
- * @param {?} key
- * @param {?} id
- * @return {?}
+ * @function findEntityById
+ * @param {String} key The entity key.
+ * @param {Number} id The identifier value. An Id field is assumed for each element.
+ * @returns {*} The value of the found element.
  */
 function findEntityById(key, id) {
-    /** @type {?} */
-    var data = (/** @type {?} */ (getEntity(key, tyArray)));
+    var data = getEntity(key, tyArray);
     return find(data, { Id: id });
 }
 /**
  * Removes an element of an entity of type array.
- * @param {?} key
- * @param {?} id
- * @return {?}
+ * @function removeEntityById
+ * @param {String} key The entity key.
+ * @param {Number} id The identifier value for the element to be removed.
  */
 function removeEntityById(key, id) {
-    /** @type {?} */
-    var data = (/** @type {?} */ (getEntity(key, tyArray)));
-    /** @type {?} */
+    var data = getEntity(key, tyArray);
     var index = findIndex(data, { Id: id });
     if (index === -1) {
         return;
@@ -3153,14 +1876,12 @@ function removeEntityById(key, id) {
 }
 /**
  * Inserts or udpates an element of an entity of type array.
- * @param {?} key
- * @param {?} entity
- * @return {?}
+ * @function insertOrUpdateEntity
+ * @param {String} key The entity key.
+ * @param {Array} entity The new value of the entity.
  */
 function insertOrUpdateEntity(key, entity) {
-    /** @type {?} */
-    var data = (/** @type {?} */ (getEntity(key, tyArray)));
-    /** @type {?} */
+    var data = getEntity(key, tyArray);
     var index = findIndex(data, { Id: entity.Id });
     if (index !== -1) {
         data[index] = entity;
@@ -3172,11 +1893,11 @@ function insertOrUpdateEntity(key, entity) {
 }
 /**
  * Removes a group of entities by a given prefix.
- * @param {?} prefix
- * @return {?}
+ * @function cleanEntityGroup
+ * @param {String} prefix The prefix of the keys of the entities to be removed. We organize entities somewhat hirarchly.
+ * @returns {Boolean}
  */
 function cleanEntityGroup(prefix) {
-    /** @type {?} */
     var keys = [];
     for (var p in globalLocalStorage) {
         if (globalLocalStorage.hasOwnProperty(p) &&
@@ -3194,8 +1915,16 @@ function cleanEntityGroup(prefix) {
 }
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Encapsulates the local storage service into one
+ * providing prmoise-aware services.
+ * @name LocalStorageTable.js
+ * @module hypercom/storage/LocalStorageTable
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
+ */
+/**
+ * @class LocalStorageTable
  */
 var LocalStorageTable = /** @class */ (function () {
     function LocalStorageTable() {
@@ -3207,20 +1936,7 @@ var LocalStorageTable = /** @class */ (function () {
      * @returns {Promise}
      * @throws {Error}
      */
-    /**
-     * Gets the value for the given key.
-     * @throws {Error}
-     * @param {?} key
-     * @return {?}
-     */
-    LocalStorageTable.prototype.getP = /**
-     * Gets the value for the given key.
-     * @throws {Error}
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
-        /** @type {?} */
+    LocalStorageTable.prototype.getP = function (key) {
         var data = getEntity(key, tyObject);
         return lift(data, null);
     };
@@ -3231,19 +1947,7 @@ var LocalStorageTable = /** @class */ (function () {
      * @returns {Promise}
      * @throws {Error}
      */
-    /**
-     * Removes the key from the keychain.
-     * @throws {Error}
-     * @param {?} key
-     * @return {?}
-     */
-    LocalStorageTable.prototype.removeP = /**
-     * Removes the key from the keychain.
-     * @throws {Error}
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
+    LocalStorageTable.prototype.removeP = function (key) {
         cleanEntity(key, tyObject);
         return lift(true, null);
     };
@@ -3254,21 +1958,7 @@ var LocalStorageTable = /** @class */ (function () {
      * @returns {Promise}
      * @throws {Error}
      */
-    /**
-     * Updates the value for the given key.
-     * @throws {Error}
-     * @param {?} key
-     * @param {?} value
-     * @return {?}
-     */
-    LocalStorageTable.prototype.updateP = /**
-     * Updates the value for the given key.
-     * @throws {Error}
-     * @param {?} key
-     * @param {?} value
-     * @return {?}
-     */
-    function (key, value) {
+    LocalStorageTable.prototype.updateP = function (key, value) {
         updateEntity(key, value, tyObject);
         return lift(true, null);
     };
@@ -3276,44 +1966,24 @@ var LocalStorageTable = /** @class */ (function () {
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Provides i18n service. This module is designed as
+ * a delegate of the tinymce I18n service.
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
-var _i18n = I18n;
-var I18n$1 = /** @class */ (function () {
-    function I18n$$1() {
+var _i18n = I18n$1;
+var I18n = /** @class */ (function () {
+    function I18n() {
     }
-    /**
-     * @param {?} code
-     * @return {?}
-     */
-    I18n$$1.getDictByCode = /**
-     * @param {?} code
-     * @return {?}
-     */
-    function (code) {
+    I18n.getDictByCode = function (code) {
         return _i18n.data[code];
     };
     /**
      * Add a languge dictionary and set the current
      * code as the current language.
      */
-    /**
-     * Add a languge dictionary and set the current
-     * code as the current language.
-     * @param {?} code
-     * @param {?} items
-     * @return {?}
-     */
-    I18n$$1.add = /**
-     * Add a languge dictionary and set the current
-     * code as the current language.
-     * @param {?} code
-     * @param {?} items
-     * @return {?}
-     */
-    function (code, items) {
+    I18n.add = function (code, items) {
         _i18n.add(code, items);
     };
     /**
@@ -3324,22 +1994,7 @@ var I18n$1 = /** @class */ (function () {
      * @param {String} defaultText The default value.
      * @returns {String} The translation for the given text.
      */
-    /**
-     * Trnsaltes a given text. If the given text
-     * is missing in the dictionary, use the given default value.
-     * @param {?} text
-     * @param {?} defaultText
-     * @return {?}
-     */
-    I18n$$1.translate = /**
-     * Trnsaltes a given text. If the given text
-     * is missing in the dictionary, use the given default value.
-     * @param {?} text
-     * @param {?} defaultText
-     * @return {?}
-     */
-    function (text, defaultText) {
-        /** @type {?} */
+    I18n.translate = function (text, defaultText) {
         var value = _i18n.translate(text);
         if (value === text && defaultText) {
             return defaultText;
@@ -3351,20 +2006,8 @@ var I18n$1 = /** @class */ (function () {
      * @function recycleOthers
      * @param {String} code The language code which should not released.
      */
-    /**
-     * Removes unused languages to release memory.
-     * @param {?} code
-     * @return {?}
-     */
-    I18n$$1.recycleOthers = /**
-     * Removes unused languages to release memory.
-     * @param {?} code
-     * @return {?}
-     */
-    function (code) {
-        /** @type {?} */
+    I18n.recycleOthers = function (code) {
         var data = _i18n.data;
-        /** @type {?} */
         var recycleList = [];
         for (var key in data) {
             // skip loop if the property is from prototype
@@ -3374,51 +2017,62 @@ var I18n$1 = /** @class */ (function () {
         }
         /*jslint plusplus: true */
         for (var i = 0; i < recycleList.length; i++) {
-            /** @type {?} */
             var k = recycleList[i];
             delete data[k];
         }
     };
-    return I18n$$1;
+    return I18n;
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @fileOverview
+ * Defines a Resources class.
+ * With this class, you may configure a bunch of resources
+ * accessible from global URIs, such as URLs.
+ * Once the requested resources are loaded, they may be
+ * cached in the memory.
+ * Note that the resources are expected to be organized in
+ * a common namespace hierarchy.
+ * E.g.,
+ * x.y.z corresponds to a json resource like:
+ *    {
+ *       y: {
+ *             z: 112
+ *          }
+ *    }
+ * @author Xiaolong Tang <xxlongtang@gmail.com>
+ * @license Copyright @me
  */
-/** @type {?} */
-var _$8 = underscore;
-/** @type {?} */
-var isString = _$8.isString;
+var _$7 = underscore;
+var isString = _$7.isString;
 /**
  * Retrieves a value from a variable by a given namespace nested structure.
- * @template T
- * @param {?} repo
- * @param {?} identifiers
- * @param {?=} startLevel
- * @return {?}
+ * @function getByNamespace
+ * @param {Object} repo
+ * @param {*} fullyQualifiedNamespace A string or an arry of string defining the namespace.
+ * @param {Number}[] startLevel
+ * @returns {*}
  */
 function getByNamespace(repo, identifiers, startLevel) {
     if (startLevel === void 0) { startLevel = 1; }
-    /** @type {?} */
     var restIdentifiers = identifiers.slice(startLevel);
-    /** @type {?} */
     var restKey = restIdentifiers.join('.');
     if (repo[restKey]) {
         return repo[restKey];
     }
-    /** @type {?} */
     var initRepo = repo;
     for (var index = startLevel; index < identifiers.length; index++) {
         if (!initRepo) {
             break;
         }
-        /** @type {?} */
         var key = identifiers[index];
         initRepo = initRepo[key];
     }
     return initRepo;
 }
+/**
+ * @class Resources
+ */
 var ResourceLoader = /** @class */ (function () {
     /**
      * Constructor
@@ -3437,25 +2091,8 @@ var ResourceLoader = /** @class */ (function () {
      * @param {Number} liveSeconds The cache period.
      * @throws {Error}
      */
-    /**
-     * Configure a resource
-     * @throws {Error}
-     * @param {?} key
-     * @param {?} uri
-     * @param {?=} liveSeconds
-     * @return {?}
-     */
-    ResourceLoader.prototype.register = /**
-     * Configure a resource
-     * @throws {Error}
-     * @param {?} key
-     * @param {?} uri
-     * @param {?=} liveSeconds
-     * @return {?}
-     */
-    function (key, uri, liveSeconds) {
+    ResourceLoader.prototype.register = function (key, uri, liveSeconds) {
         if (liveSeconds === void 0) { liveSeconds = 60; }
-        /** @type {?} */
         var configuration = this._configuration;
         if (configuration[key]) {
             throw new Error('Registering an existing resource key: ' + key);
@@ -3470,18 +2107,7 @@ var ResourceLoader = /** @class */ (function () {
      * @function undoRegister
      * @param {String} key The resource key to be removed.
      */
-    /**
-     * Removes a registered item
-     * @param {?} key
-     * @return {?}
-     */
-    ResourceLoader.prototype.undoRegister = /**
-     * Removes a registered item
-     * @param {?} key
-     * @return {?}
-     */
-    function (key) {
-        /** @type {?} */
+    ResourceLoader.prototype.undoRegister = function (key) {
         var configuration = this._configuration;
         if (configuration[key]) {
             delete configuration[key];
@@ -3494,35 +2120,14 @@ var ResourceLoader = /** @class */ (function () {
      * @returns {*} The resource value.
      * @throws {Error}
      */
-    /**
-     * Returns a promise for the resource key.
-     * @throws {Error}
-     * @template T
-     * @param {?} fullyQualifiedNamespace
-     * @param {?} convertor
-     * @return {?}
-     */
-    ResourceLoader.prototype.getPromise = /**
-     * Returns a promise for the resource key.
-     * @throws {Error}
-     * @template T
-     * @param {?} fullyQualifiedNamespace
-     * @param {?} convertor
-     * @return {?}
-     */
-    function (fullyQualifiedNamespace, convertor) {
-        /** @type {?} */
+    ResourceLoader.prototype.getPromise = function (fullyQualifiedNamespace, convertor) {
         var identifiers = fullyQualifiedNamespace.split('.');
-        /** @type {?} */
         var topIdentifier = identifiers[0];
-        /** @type {?} */
         var cache = this._cache;
         if (cache) {
             // Figure out the master key
-            /** @type {?} */
             var repo = cache.get(topIdentifier, 60);
             if (repo) {
-                /** @type {?} */
                 var value = getByNamespace(repo, identifiers);
                 if (value) {
                     // Return a promise
@@ -3530,7 +2135,6 @@ var ResourceLoader = /** @class */ (function () {
                 }
             }
         }
-        /** @type {?} */
         var entry = this._configuration[topIdentifier];
         if (!entry) {
             throw new Error('Get unregistered resource: ' + topIdentifier);
@@ -3549,40 +2153,8 @@ var ResourceLoader = /** @class */ (function () {
 }());
 
 /**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * Generated bundle index. Do not edit.
  */
 
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
- */
-
-export { RelationalTable, DummyRecords, RelationDatabase, sendPromise, loadJsonUriP, pingP, loadHtmlP, SlidingExpirationCache, MemoryBackend, adaptToOpenIDToken, OpenIDPolicy, PolicyBase, NullPolicy, UserCredential, AntiForgeryKeyPolicy, adaptToOAuthToken, OAuthTokenExtPolicy, OAuthTokenPolicy, DummyOAuthTokenCtorParams, observableDecorator, factory, CollectionStore, CollectionAbstractStore, reducer, buildInitialState, buildReducerMap, AggregateCollection, mountSyncListener, mountSyncBeforeAdvice, mountSyncAroundAdvice, mountAjaxBeforeAdvice, endPointEnum, syncMethodEnum, GlobalProvider, getEntity, updateEntity, cleanEntity, insertEntities, findEntityById, removeEntityById, insertOrUpdateEntity, cleanEntityGroup, LocalStorageTable, I18n$1 as I18n, ResourceLoader };
-
+export { AggregateCollection, AntiForgeryKeyPolicy, CollectionAbstractStore, CollectionStore, DummyOAuthTokenCtorParams, DummyRecords, GlobalProvider, I18n, LocalStorageTable, MemoryBackend, NullPolicy, OAuthTokenExtPolicy, OAuthTokenPolicy, OpenIDPolicy, PolicyBase, RelationDatabase, RelationalTable, ResourceLoader, SlidingExpirationCache, UserCredential, adaptToOAuthToken, adaptToOpenIDToken, buildInitialState, buildReducerMap, cleanEntity, cleanEntityGroup, endPointEnum, factory, findEntityById, getEntity, insertEntities, insertOrUpdateEntity, loadHtmlP, loadJsonUriP, mountAjaxBeforeAdvice, mountSyncAroundAdvice, mountSyncBeforeAdvice, mountSyncListener, observableDecorator, pingP, reducer, removeEntityById, sendPromise, syncMethodEnum, updateEntity, ɵ0 };
 //# sourceMappingURL=polpware-fe-data.js.map
