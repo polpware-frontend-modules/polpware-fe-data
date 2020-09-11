@@ -10,12 +10,12 @@ export declare class SlidingExpirationCache<T> implements ISlidingExpireCache<T>
     private onExpireEventName;
     private afterRemoveEventName;
     private resetExpireKey;
-    readonly asObservable: IObservable;
+    get asObservable(): IObservable;
     set(key: string, value: T, seconds: number, afterRemoveCallback?: (evt: IEventArgs<{}>) => IEventArgs<{}>): any;
     get(key: string, seconds?: number): T | null;
     rmOnExpireHandler(key: string, callback: (evt: IEventArgs<{}>) => IEventArgs<{}>): void;
     addOnExpireHandler(key: string, callback: (evt: IEventArgs<{}>) => IEventArgs<{}>): void;
-    readonly count: number;
+    get count(): number;
     reset(): void;
     destroy(): void;
 }

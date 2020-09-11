@@ -43,8 +43,8 @@ export declare class GlobalProvider {
     private _myEndPointKeys;
     private _uniqueNamePrefix;
     constructor(ctorOptions: IGlobalProviderCtorOptions);
-    readonly host: string;
-    readonly configurationMapping: {
+    get host(): string;
+    get configurationMapping(): {
         [key: string]: any;
     };
     /**

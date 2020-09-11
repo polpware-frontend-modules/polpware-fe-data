@@ -1,8 +1,8 @@
 import { backbone as backbone$4, underscore, constraintjs, XHR as XHR$1, Tools, jquery, EventDispatcher as EventDispatcher$1, locache as locache$1, meld as meld$2, when as when$1, dataflow, I18n as I18n$1 } from '@polpware/fe-dependencies';
 import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, ok, tyArray, tyObject } from '@polpware/fe-utilities';
 import { __decorate, __metadata } from 'tslib';
-import { ActionsSubject, ScannedActionsSubject, ReducerManager, State, Store, combineReducers } from '@ngrx/store';
-import { Injectable } from '@angular/core';
+import { ActionsSubject, ScannedActionsSubject, combineReducers, ReducerManager, State, Store } from '@ngrx/store';
+import { ɵɵdefineInjectable, ɵsetClassMetadata, Injectable } from '@angular/core';
 
 /**
  * @fileOverview
@@ -519,7 +519,6 @@ const originalRemove = Object.getPrototypeOf(locache.locache).remove;
 const currentTime = function () {
     return new Date().getTime();
 };
-const ɵ0 = currentTime;
 let SlidingExpirationCache = class SlidingExpirationCache {
     constructor(_defaultSeconds, scheduleInterval, ngZone) {
         this._defaultSeconds = _defaultSeconds;
@@ -644,6 +643,11 @@ let SlidingExpirationCache = class SlidingExpirationCache {
         }
     }
 };
+SlidingExpirationCache.ctorParameters = () => [
+    { type: Number },
+    { type: Number },
+    { type: undefined }
+];
 SlidingExpirationCache = __decorate([
     observableDecorator,
     __metadata("design:paramtypes", [Number, Number, Object])
@@ -693,6 +697,7 @@ class PolicyBase {
  * @fileOverview
  * Defines a base class for retrieving OAuth2 tokens.
  */
+const _$3 = underscore;
 const $$1 = jquery;
 function adaptToOAuthToken(data) {
     data = data || {};
@@ -825,7 +830,7 @@ class OAuthTokenPolicy extends PolicyBase {
 function adaptToOpenIDToken(data) {
     data = data || {};
     const r = adaptToOAuthToken(data);
-    return Object.assign({}, r, { openId: data.openId || '' });
+    return Object.assign(Object.assign({}, r), { openId: data.openId || '' });
 }
 class OpenIDPolicy extends OAuthTokenPolicy {
     constructor() {
@@ -837,7 +842,7 @@ class OpenIDPolicy extends OAuthTokenPolicy {
      */
     persistent() {
         const r = super.persistent();
-        return Object.assign({}, r, { openId: this._openId });
+        return Object.assign(Object.assign({}, r), { openId: this._openId });
     }
     /**
      * Reads credential from the given settings.
@@ -867,7 +872,7 @@ class NullPolicy {
     reset() { }
 }
 
-const _$3 = underscore;
+const _$4 = underscore;
 function isEquiva(a, b) {
     // Strict equals
     if (a === b) {
@@ -935,7 +940,7 @@ let UserCredential = class UserCredential {
     }
     // Does not trigger any event
     readFrom(data) {
-        this._user = _$3.extend(this._user, data);
+        this._user = _$4.extend(this._user, data);
     }
     setUser(data) {
         if (isEquiva(this._user, data)) {
@@ -947,11 +952,11 @@ let UserCredential = class UserCredential {
         });
     }
     extendUser(data) {
-        const newData = _$3.extend({}, this._user, data);
+        const newData = _$4.extend({}, this._user, data);
         this.setUser(newData);
     }
     getUser() {
-        return _$3.extend({}, this._user);
+        return _$4.extend({}, this._user);
     }
     subscribe(handler, likeBehaviorSubject = false) {
         this.asObservable.on('change:user', handler);
@@ -970,6 +975,9 @@ let UserCredential = class UserCredential {
         return this.authPolicy && !this.authPolicy.isExpired();
     }
 };
+UserCredential.ctorParameters = () => [
+    { type: undefined }
+];
 UserCredential = __decorate([
     observableDecorator,
     __metadata("design:paramtypes", [Object])
@@ -1117,7 +1125,7 @@ class OAuthTokenExtPolicy extends OAuthTokenPolicy {
     // override
     getParams() {
         const p = super.getParams();
-        return Object.assign({}, p, this._payload);
+        return Object.assign(Object.assign({}, p), this._payload);
     }
 }
 
@@ -1131,7 +1139,7 @@ function reducer(state, action) {
                 });
                 return index === -1;
             });
-            return Object.assign({}, state, { items: [
+            return Object.assign(Object.assign({}, state), { items: [
                     ...state.items,
                     ...payload
                 ] });
@@ -1143,7 +1151,7 @@ function reducer(state, action) {
                 });
                 return index === -1;
             });
-            return Object.assign({}, state, { items: newItems });
+            return Object.assign(Object.assign({}, state), { items: newItems });
         }
         case 'MODIFY': {
             // Nothing to do
@@ -1209,6 +1217,7 @@ function buildReducerMap() {
 function factory() {
     const actionSubject = new ActionsSubject();
     const scannerActionSubject = new ScannedActionsSubject();
+    const reducerManagerDispatch = actionSubject;
     const actionReducerFactory = combineReducers;
     const reducerManager = new ReducerManager(actionSubject, buildInitialState(), buildReducerMap(), actionReducerFactory);
     const stateObservable = new State(actionSubject, reducerManager, scannerActionSubject, buildInitialState());
@@ -1237,7 +1246,7 @@ class CollectionAbstractStore {
     }
 }
 
-let CollectionStore = class CollectionStore extends CollectionAbstractStore {
+class CollectionStore extends CollectionAbstractStore {
     constructor() {
         super();
         this._store = factory();
@@ -1248,11 +1257,12 @@ let CollectionStore = class CollectionStore extends CollectionAbstractStore {
     getState() {
         return this._store.select('collection');
     }
-};
-CollectionStore = __decorate([
-    Injectable(),
-    __metadata("design:paramtypes", [])
-], CollectionStore);
+}
+CollectionStore.ɵfac = function CollectionStore_Factory(t) { return new (t || CollectionStore)(); };
+CollectionStore.ɵprov = ɵɵdefineInjectable({ token: CollectionStore, factory: CollectionStore.ɵfac });
+/*@__PURE__*/ (function () { ɵsetClassMetadata(CollectionStore, [{
+        type: Injectable
+    }], function () { return []; }, null); })();
 
 /**
  * @fileOverview
@@ -1265,7 +1275,7 @@ CollectionStore = __decorate([
  * preversing the state of each data provider.
  */
 const when = when$1;
-const _$4 = underscore;
+const _$5 = underscore;
 function hasNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return true;
@@ -1291,7 +1301,7 @@ class AggregateCollection {
         if (this._providerGenerator.hasMore()) {
             return true;
         }
-        return _$4.some(this._workingProviders, function (elem) {
+        return _$5.some(this._workingProviders, function (elem) {
             return elem.hasNextPage();
         });
     }
@@ -1299,14 +1309,14 @@ class AggregateCollection {
         // Generate providers
         return this._providerGenerator.getNext()
             .then((providers) => {
-            providers = _$4.filter(providers, function (p) {
+            providers = _$5.filter(providers, function (p) {
                 return hasNextPage(p);
             });
             return providers;
         })
             .then((providers) => {
             this._workingProviders.length = 0;
-            const promises = _$4.map(providers, function (p) {
+            const promises = _$5.map(providers, function (p) {
                 return getNextPage(p)
                     .then((resp) => {
                     this._workingProviders.push(p);
@@ -1406,7 +1416,7 @@ function mountAjaxBeforeAdvice(callback) {
  */
 const DataFlow = dataflow;
 const backbone$3 = backbone$4;
-const _$5 = underscore;
+const _$6 = underscore;
 /**
  * The endpoint types for a backend service.
  */
@@ -1506,7 +1516,7 @@ function mountFeatures() {
                 options.contentType === 'application/json') {
                 options.data = JSON.parse(options.data);
                 if (extraParams) {
-                    _$5.extend(options.data, extraParams);
+                    _$6.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -1516,7 +1526,7 @@ function mountFeatures() {
             }
             else {
                 if (extraParams) {
-                    _$5.extend(options.data, extraParams);
+                    _$6.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -1573,7 +1583,7 @@ class GlobalProvider {
             throw new Error('Redefined endpoint: ' + name);
         }
         cfgMapping[uniqueName] = {
-            options: _$5.extend(options, { endPointKey: uniqueName }),
+            options: _$6.extend(options, { endPointKey: uniqueName }),
             tag: tag
         };
         this._myEndPointKeys.push(uniqueName);
@@ -1695,7 +1705,7 @@ class GlobalProvider {
 // and which is defined only in TINYMCE.
 // import * as localStorage from 'polpware-tinymce-tailor/src/util/LocalStorage.js';
 const globalLocalStorage = window.localStorage;
-const _$6 = underscore, find = _$6.find, findIndex = _$6.findIndex, union = _$6.union;
+const _$7 = underscore, find = _$7.find, findIndex = _$7.findIndex, union = _$7.union;
 /**
  * Reads the value of an entity by its key.
  * @function getEntity
@@ -1957,8 +1967,8 @@ class I18n {
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
-const _$7 = underscore;
-const isString = _$7.isString;
+const _$8 = underscore;
+const isString = _$8.isString;
 /**
  * Retrieves a value from a variable by a given namespace nested structure.
  * @function getByNamespace
@@ -2066,5 +2076,5 @@ class ResourceLoader {
  * Generated bundle index. Do not edit.
  */
 
-export { AggregateCollection, AntiForgeryKeyPolicy, CollectionAbstractStore, CollectionStore, DummyOAuthTokenCtorParams, DummyRecords, GlobalProvider, I18n, LocalStorageTable, MemoryBackend, NullPolicy, OAuthTokenExtPolicy, OAuthTokenPolicy, OpenIDPolicy, PolicyBase, RelationDatabase, RelationalTable, ResourceLoader, SlidingExpirationCache, UserCredential, adaptToOAuthToken, adaptToOpenIDToken, buildInitialState, buildReducerMap, cleanEntity, cleanEntityGroup, endPointEnum, factory, findEntityById, getEntity, insertEntities, insertOrUpdateEntity, loadHtmlP, loadJsonUriP, mountAjaxBeforeAdvice, mountSyncAroundAdvice, mountSyncBeforeAdvice, mountSyncListener, observableDecorator, pingP, reducer, removeEntityById, sendPromise, syncMethodEnum, updateEntity, ɵ0 };
+export { AggregateCollection, AntiForgeryKeyPolicy, CollectionAbstractStore, CollectionStore, DummyOAuthTokenCtorParams, DummyRecords, GlobalProvider, I18n, LocalStorageTable, MemoryBackend, NullPolicy, OAuthTokenExtPolicy, OAuthTokenPolicy, OpenIDPolicy, PolicyBase, RelationDatabase, RelationalTable, ResourceLoader, SlidingExpirationCache, UserCredential, adaptToOAuthToken, adaptToOpenIDToken, buildInitialState, buildReducerMap, cleanEntity, cleanEntityGroup, endPointEnum, factory, findEntityById, getEntity, insertEntities, insertOrUpdateEntity, loadHtmlP, loadJsonUriP, mountAjaxBeforeAdvice, mountSyncAroundAdvice, mountSyncBeforeAdvice, mountSyncListener, observableDecorator, pingP, reducer, removeEntityById, sendPromise, syncMethodEnum, updateEntity };
 //# sourceMappingURL=polpware-fe-data.js.map

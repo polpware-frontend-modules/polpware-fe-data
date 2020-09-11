@@ -15,7 +15,7 @@ export declare class UserCredential<T extends IPolicy> {
      * @constructor Credential
      */
     constructor(authPolicy: T);
-    readonly asObservable: IObservable;
+    get asObservable(): IObservable;
     security(value?: T): T;
     readFrom<U extends IUserProfile>(data: U): void;
     setUser<U extends IUserProfile>(data: U): void;

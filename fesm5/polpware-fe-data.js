@@ -1,8 +1,8 @@
-import { underscore, backbone as backbone$4, constraintjs, XHR as XHR$1, Tools, jquery, EventDispatcher as EventDispatcher$1, locache as locache$1, meld as meld$2, when as when$1, dataflow, I18n as I18n$1 } from '@polpware/fe-dependencies';
+import { backbone as backbone$4, underscore, constraintjs, XHR as XHR$1, Tools, jquery, EventDispatcher as EventDispatcher$1, locache as locache$1, meld as meld$2, when as when$1, dataflow, I18n as I18n$1 } from '@polpware/fe-dependencies';
 import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, ok, tyArray, tyObject } from '@polpware/fe-utilities';
 import { __extends, __decorate, __metadata, __assign, __spread } from 'tslib';
-import { ActionsSubject, ScannedActionsSubject, ReducerManager, State, Store, combineReducers } from '@ngrx/store';
-import { Injectable } from '@angular/core';
+import { ActionsSubject, ScannedActionsSubject, combineReducers, ReducerManager, State, Store } from '@ngrx/store';
+import { ɵɵdefineInjectable, ɵsetClassMetadata, Injectable } from '@angular/core';
 
 /**
  * @fileOverview
@@ -550,7 +550,6 @@ var originalRemove = Object.getPrototypeOf(locache.locache).remove;
 var currentTime = function () {
     return new Date().getTime();
 };
-var ɵ0 = currentTime;
 var SlidingExpirationCache = /** @class */ (function () {
     function SlidingExpirationCache(_defaultSeconds, scheduleInterval, ngZone) {
         var _this = this;
@@ -684,6 +683,11 @@ var SlidingExpirationCache = /** @class */ (function () {
             clearInterval(this._timeInterval);
         }
     };
+    SlidingExpirationCache.ctorParameters = function () { return [
+        { type: Number },
+        { type: Number },
+        { type: undefined }
+    ]; };
     SlidingExpirationCache = __decorate([
         observableDecorator,
         __metadata("design:paramtypes", [Number, Number, Object])
@@ -737,6 +741,7 @@ var PolicyBase = /** @class */ (function () {
  * @fileOverview
  * Defines a base class for retrieving OAuth2 tokens.
  */
+var _$3 = underscore;
 var $$1 = jquery;
 function adaptToOAuthToken(data) {
     data = data || {};
@@ -874,7 +879,7 @@ var OAuthTokenPolicy = /** @class */ (function (_super) {
 function adaptToOpenIDToken(data) {
     data = data || {};
     var r = adaptToOAuthToken(data);
-    return __assign({}, r, { openId: data.openId || '' });
+    return __assign(__assign({}, r), { openId: data.openId || '' });
 }
 var OpenIDPolicy = /** @class */ (function (_super) {
     __extends(OpenIDPolicy, _super);
@@ -888,7 +893,7 @@ var OpenIDPolicy = /** @class */ (function (_super) {
      */
     OpenIDPolicy.prototype.persistent = function () {
         var r = _super.prototype.persistent.call(this);
-        return __assign({}, r, { openId: this._openId });
+        return __assign(__assign({}, r), { openId: this._openId });
     };
     /**
      * Reads credential from the given settings.
@@ -922,7 +927,7 @@ var NullPolicy = /** @class */ (function () {
     return NullPolicy;
 }());
 
-var _$3 = underscore;
+var _$4 = underscore;
 function isEquiva(a, b) {
     // Strict equals
     if (a === b) {
@@ -994,7 +999,7 @@ var UserCredential = /** @class */ (function () {
     };
     // Does not trigger any event
     UserCredential.prototype.readFrom = function (data) {
-        this._user = _$3.extend(this._user, data);
+        this._user = _$4.extend(this._user, data);
     };
     UserCredential.prototype.setUser = function (data) {
         if (isEquiva(this._user, data)) {
@@ -1006,11 +1011,11 @@ var UserCredential = /** @class */ (function () {
         });
     };
     UserCredential.prototype.extendUser = function (data) {
-        var newData = _$3.extend({}, this._user, data);
+        var newData = _$4.extend({}, this._user, data);
         this.setUser(newData);
     };
     UserCredential.prototype.getUser = function () {
-        return _$3.extend({}, this._user);
+        return _$4.extend({}, this._user);
     };
     UserCredential.prototype.subscribe = function (handler, likeBehaviorSubject) {
         if (likeBehaviorSubject === void 0) { likeBehaviorSubject = false; }
@@ -1029,6 +1034,9 @@ var UserCredential = /** @class */ (function () {
     UserCredential.prototype.isAuthenticated = function () {
         return this.authPolicy && !this.authPolicy.isExpired();
     };
+    UserCredential.ctorParameters = function () { return [
+        { type: undefined }
+    ]; };
     UserCredential = __decorate([
         observableDecorator,
         __metadata("design:paramtypes", [Object])
@@ -1180,7 +1188,7 @@ var OAuthTokenExtPolicy = /** @class */ (function (_super) {
     // override
     OAuthTokenExtPolicy.prototype.getParams = function () {
         var p = _super.prototype.getParams.call(this);
-        return __assign({}, p, this._payload);
+        return __assign(__assign({}, p), this._payload);
     };
     return OAuthTokenExtPolicy;
 }(OAuthTokenPolicy));
@@ -1195,7 +1203,7 @@ function reducer(state, action) {
                 });
                 return index === -1;
             });
-            return __assign({}, state, { items: __spread(state.items, payload) });
+            return __assign(__assign({}, state), { items: __spread(state.items, payload) });
         }
         case 'REMOVE': {
             var newItems = state.items.filter(function (x) {
@@ -1204,7 +1212,7 @@ function reducer(state, action) {
                 });
                 return index === -1;
             });
-            return __assign({}, state, { items: newItems });
+            return __assign(__assign({}, state), { items: newItems });
         }
         case 'MODIFY': {
             // Nothing to do
@@ -1270,6 +1278,7 @@ function buildReducerMap() {
 function factory() {
     var actionSubject = new ActionsSubject();
     var scannerActionSubject = new ScannedActionsSubject();
+    var reducerManagerDispatch = actionSubject;
     var actionReducerFactory = combineReducers;
     var reducerManager = new ReducerManager(actionSubject, buildInitialState(), buildReducerMap(), actionReducerFactory);
     var stateObservable = new State(actionSubject, reducerManager, scannerActionSubject, buildInitialState());
@@ -1314,12 +1323,13 @@ var CollectionStore = /** @class */ (function (_super) {
     CollectionStore.prototype.getState = function () {
         return this._store.select('collection');
     };
-    CollectionStore = __decorate([
-        Injectable(),
-        __metadata("design:paramtypes", [])
-    ], CollectionStore);
+    CollectionStore.ɵfac = function CollectionStore_Factory(t) { return new (t || CollectionStore)(); };
+    CollectionStore.ɵprov = ɵɵdefineInjectable({ token: CollectionStore, factory: CollectionStore.ɵfac });
     return CollectionStore;
 }(CollectionAbstractStore));
+/*@__PURE__*/ (function () { ɵsetClassMetadata(CollectionStore, [{
+        type: Injectable
+    }], function () { return []; }, null); })();
 
 /**
  * @fileOverview
@@ -1332,7 +1342,7 @@ var CollectionStore = /** @class */ (function (_super) {
  * preversing the state of each data provider.
  */
 var when = when$1;
-var _$4 = underscore;
+var _$5 = underscore;
 function hasNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return true;
@@ -1358,7 +1368,7 @@ var AggregateCollection = /** @class */ (function () {
         if (this._providerGenerator.hasMore()) {
             return true;
         }
-        return _$4.some(this._workingProviders, function (elem) {
+        return _$5.some(this._workingProviders, function (elem) {
             return elem.hasNextPage();
         });
     };
@@ -1367,14 +1377,14 @@ var AggregateCollection = /** @class */ (function () {
         // Generate providers
         return this._providerGenerator.getNext()
             .then(function (providers) {
-            providers = _$4.filter(providers, function (p) {
+            providers = _$5.filter(providers, function (p) {
                 return hasNextPage(p);
             });
             return providers;
         })
             .then(function (providers) {
             _this._workingProviders.length = 0;
-            var promises = _$4.map(providers, function (p) {
+            var promises = _$5.map(providers, function (p) {
                 var _this = this;
                 return getNextPage(p)
                     .then(function (resp) {
@@ -1476,7 +1486,7 @@ function mountAjaxBeforeAdvice(callback) {
  */
 var DataFlow = dataflow;
 var backbone$3 = backbone$4;
-var _$5 = underscore;
+var _$6 = underscore;
 /**
  * The endpoint types for a backend service.
  */
@@ -1576,7 +1586,7 @@ function mountFeatures() {
                 options.contentType === 'application/json') {
                 options.data = JSON.parse(options.data);
                 if (extraParams) {
-                    _$5.extend(options.data, extraParams);
+                    _$6.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -1586,7 +1596,7 @@ function mountFeatures() {
             }
             else {
                 if (extraParams) {
-                    _$5.extend(options.data, extraParams);
+                    _$6.extend(options.data, extraParams);
                 }
                 if (policyDelegate) {
                     policyDelegate(options);
@@ -1651,7 +1661,7 @@ var GlobalProvider = /** @class */ (function () {
             throw new Error('Redefined endpoint: ' + name);
         }
         cfgMapping[uniqueName] = {
-            options: _$5.extend(options, { endPointKey: uniqueName }),
+            options: _$6.extend(options, { endPointKey: uniqueName }),
             tag: tag
         };
         this._myEndPointKeys.push(uniqueName);
@@ -1774,7 +1784,7 @@ var GlobalProvider = /** @class */ (function () {
 // and which is defined only in TINYMCE.
 // import * as localStorage from 'polpware-tinymce-tailor/src/util/LocalStorage.js';
 var globalLocalStorage = window.localStorage;
-var _$6 = underscore, find = _$6.find, findIndex = _$6.findIndex, union = _$6.union;
+var _$7 = underscore, find = _$7.find, findIndex = _$7.findIndex, union = _$7.union;
 /**
  * Reads the value of an entity by its key.
  * @function getEntity
@@ -2043,8 +2053,8 @@ var I18n = /** @class */ (function () {
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
-var _$7 = underscore;
-var isString = _$7.isString;
+var _$8 = underscore;
+var isString = _$8.isString;
 /**
  * Retrieves a value from a variable by a given namespace nested structure.
  * @function getByNamespace
@@ -2156,5 +2166,5 @@ var ResourceLoader = /** @class */ (function () {
  * Generated bundle index. Do not edit.
  */
 
-export { AggregateCollection, AntiForgeryKeyPolicy, CollectionAbstractStore, CollectionStore, DummyOAuthTokenCtorParams, DummyRecords, GlobalProvider, I18n, LocalStorageTable, MemoryBackend, NullPolicy, OAuthTokenExtPolicy, OAuthTokenPolicy, OpenIDPolicy, PolicyBase, RelationDatabase, RelationalTable, ResourceLoader, SlidingExpirationCache, UserCredential, adaptToOAuthToken, adaptToOpenIDToken, buildInitialState, buildReducerMap, cleanEntity, cleanEntityGroup, endPointEnum, factory, findEntityById, getEntity, insertEntities, insertOrUpdateEntity, loadHtmlP, loadJsonUriP, mountAjaxBeforeAdvice, mountSyncAroundAdvice, mountSyncBeforeAdvice, mountSyncListener, observableDecorator, pingP, reducer, removeEntityById, sendPromise, syncMethodEnum, updateEntity, ɵ0 };
+export { AggregateCollection, AntiForgeryKeyPolicy, CollectionAbstractStore, CollectionStore, DummyOAuthTokenCtorParams, DummyRecords, GlobalProvider, I18n, LocalStorageTable, MemoryBackend, NullPolicy, OAuthTokenExtPolicy, OAuthTokenPolicy, OpenIDPolicy, PolicyBase, RelationDatabase, RelationalTable, ResourceLoader, SlidingExpirationCache, UserCredential, adaptToOAuthToken, adaptToOpenIDToken, buildInitialState, buildReducerMap, cleanEntity, cleanEntityGroup, endPointEnum, factory, findEntityById, getEntity, insertEntities, insertOrUpdateEntity, loadHtmlP, loadJsonUriP, mountAjaxBeforeAdvice, mountSyncAroundAdvice, mountSyncBeforeAdvice, mountSyncListener, observableDecorator, pingP, reducer, removeEntityById, sendPromise, syncMethodEnum, updateEntity };
 //# sourceMappingURL=polpware-fe-data.js.map

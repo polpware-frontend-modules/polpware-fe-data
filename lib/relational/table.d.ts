@@ -35,8 +35,8 @@ export declare class RelationalTable implements IRelationalTable {
     private _dataProvider;
     private _onDeletedHandler;
     constructor(options: IRelationalTableOptions, dummyRecords: DummyRecords);
-    readonly name: string;
-    readonly cascade: boolean;
+    get name(): string;
+    get cascade(): boolean;
     dataProvider(): IFullBackboneCollectionLike;
     onDeleted(): void;
     /**
