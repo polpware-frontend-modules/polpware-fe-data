@@ -654,6 +654,11 @@ var SlidingExpirationCache = /** @class */ (function () {
         // just return that.
         return value;
     };
+    SlidingExpirationCache.prototype.invalidate = function (key) {
+        var keys = this._cache.keys() || [];
+        keys = keys.filter(function (a) { return a.indexOf(key) !== -1; });
+        this.resetInternal(keys);
+    };
     SlidingExpirationCache.prototype.rmOnExpireHandler = function (key, callback) {
         this.asObservable.off(this.onExpireEventName(key), callback);
     };
@@ -668,8 +673,11 @@ var SlidingExpirationCache = /** @class */ (function () {
         configurable: true
     });
     SlidingExpirationCache.prototype.reset = function () {
+        var keys = this._cache.keys() || [];
+        this.resetInternal(keys);
+    };
+    SlidingExpirationCache.prototype.resetInternal = function (keys) {
         var _this = this;
-        var keys = this._cache.keys();
         keys.forEach(function (k) {
             _this.asObservable.off(_this.onExpireEventName(k), null);
             originalRemove.call(_this._cache, k);

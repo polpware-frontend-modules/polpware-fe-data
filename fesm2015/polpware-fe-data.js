@@ -618,6 +618,11 @@ let SlidingExpirationCache = class SlidingExpirationCache {
         // just return that.
         return value;
     }
+    invalidate(key) {
+        let keys = this._cache.keys() || [];
+        keys = keys.filter(a => a.indexOf(key) !== -1);
+        this.resetInternal(keys);
+    }
     rmOnExpireHandler(key, callback) {
         this.asObservable.off(this.onExpireEventName(key), callback);
     }
@@ -628,7 +633,10 @@ let SlidingExpirationCache = class SlidingExpirationCache {
         return this._cache.length();
     }
     reset() {
-        const keys = this._cache.keys();
+        const keys = this._cache.keys() || [];
+        this.resetInternal(keys);
+    }
+    resetInternal(keys) {
         keys.forEach((k) => {
             this.asObservable.off(this.onExpireEventName(k), null);
             originalRemove.call(this._cache, k);
