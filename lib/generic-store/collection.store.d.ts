@@ -9,6 +9,6 @@ export declare class CollectionStore<T extends ICollectionItem> extends Collecti
     constructor();
     getStore(): Store<GenericState<T>>;
     getState(): Observable<ICollectionState<T>>;
-    static ɵfac: i0.ɵɵFactoryDef<CollectionStore<any>, never>;
-    static ɵprov: i0.ɵɵInjectableDef<CollectionStore<any>>;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CollectionStore<any>, never>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<CollectionStore<any>>;
 }

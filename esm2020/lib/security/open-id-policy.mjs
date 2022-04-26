@@ -1,0 +1,33 @@
+/**
+ * @fileOverview
+ * OpenID token policy, built upon OAuth2 token policy
+ */
+import { DummyOAuthTokenCtorParams } from './interfaces';
+import { OAuthTokenPolicy, adaptToOAuthToken } from './oauth-token-policy';
+export function adaptToOpenIDToken(data) {
+    data = data || {};
+    const r = adaptToOAuthToken(data);
+    return { ...r, openId: data.openId || '' };
+}
+export class OpenIDPolicy extends OAuthTokenPolicy {
+    constructor() {
+        super(DummyOAuthTokenCtorParams);
+        this._openId = '';
+    }
+    /**
+     * Returns the necessary information for peristence.
+     */
+    persistent() {
+        const r = super.persistent();
+        return { ...r, openId: this._openId };
+    }
+    /**
+     * Reads credential from the given settings.
+     */
+    readFrom(settings) {
+        super.readFrom(settings);
+        this._openId = settings.openId;
+        return this;
+    }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoib3Blbi1pZC1wb2xpY3kuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi9wcm9qZWN0cy9wb2xwd2FyZS9mZS1kYXRhL3NyYy9saWIvc2VjdXJpdHkvb3Blbi1pZC1wb2xpY3kudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7OztHQUdHO0FBRUgsT0FBTyxFQUVILHlCQUF5QixFQUM1QixNQUFNLGNBQWMsQ0FBQztBQUV0QixPQUFPLEVBQUUsZ0JBQWdCLEVBQUUsaUJBQWlCLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQztBQUUzRSxNQUFNLFVBQVUsa0JBQWtCLENBQUMsSUFBSTtJQUNuQyxJQUFJLEdBQUcsSUFBSSxJQUFJLEVBQUUsQ0FBQztJQUVsQixNQUFNLENBQUMsR0FBRyxpQkFBaUIsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUNsQyxPQUFPLEVBQUUsR0FBRyxDQUFDLEVBQUUsTUFBTSxFQUFFLElBQUksQ0FBQyxNQUFNLElBQUksRUFBRSxFQUFFLENBQUM7QUFDL0MsQ0FBQztBQUVELE1BQU0sT0FBTyxZQUFhLFNBQVEsZ0JBQWdCO0lBSTlDO1FBQ0ksS0FBSyxDQUFDLHlCQUF5QixDQUFDLENBQUM7UUFDakMsSUFBSSxDQUFDLE9BQU8sR0FBRyxFQUFFLENBQUM7SUFDdEIsQ0FBQztJQUVEOztPQUVHO0lBQ0gsVUFBVTtRQUNOLE1BQU0sQ0FBQyxHQUFHLEtBQUssQ0FBQyxVQUFVLEVBQUUsQ0FBQztRQUM3QixPQUFPLEVBQUUsR0FBRyxDQUFDLEVBQUUsTUFBTSxFQUFFLElBQUksQ0FBQyxPQUFPLEVBQUUsQ0FBQztJQUMxQyxDQUFDO0lBRUQ7O09BRUc7SUFDSCxRQUFRLENBQUMsUUFBc0I7UUFDM0IsS0FBSyxDQUFDLFFBQVEsQ0FBQyxRQUFRLENBQUMsQ0FBQztRQUN6QixJQUFJLENBQUMsT0FBTyxHQUFHLFFBQVEsQ0FBQyxNQUFNLENBQUM7UUFDL0IsT0FBTyxJQUFJLENBQUM7SUFDaEIsQ0FBQztDQUNKIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXHJcbiAqIEBmaWxlT3ZlcnZpZXdcclxuICogT3BlbklEIHRva2VuIHBvbGljeSwgYnVpbHQgdXBvbiBPQXV0aDIgdG9rZW4gcG9saWN5XHJcbiAqL1xyXG5cclxuaW1wb3J0IHtcclxuICAgIElPcGVuSURUb2tlbixcclxuICAgIER1bW15T0F1dGhUb2tlbkN0b3JQYXJhbXNcclxufSBmcm9tICcuL2ludGVyZmFjZXMnO1xyXG5cclxuaW1wb3J0IHsgT0F1dGhUb2tlblBvbGljeSwgYWRhcHRUb09BdXRoVG9rZW4gfSBmcm9tICcuL29hdXRoLXRva2VuLXBvbGljeSc7XHJcblxyXG5leHBvcnQgZnVuY3Rpb24gYWRhcHRUb09wZW5JRFRva2VuKGRhdGEpOiBJT3BlbklEVG9rZW4ge1xyXG4gICAgZGF0YSA9IGRhdGEgfHwge307XHJcblxyXG4gICAgY29uc3QgciA9IGFkYXB0VG9PQXV0aFRva2VuKGRhdGEpO1xyXG4gICAgcmV0dXJuIHsgLi4uciwgb3BlbklkOiBkYXRhLm9wZW5JZCB8fCAnJyB9O1xyXG59XHJcblxyXG5leHBvcnQgY2xhc3MgT3BlbklEUG9saWN5IGV4dGVuZHMgT0F1dGhUb2tlblBvbGljeSB7XHJcblxyXG4gICAgcHJpdmF0ZSBfb3BlbklkOiBzdHJpbmc7XHJcblxyXG4gICAgY29uc3RydWN0b3IoKSB7XHJcbiAgICAgICAgc3VwZXIoRHVtbXlPQXV0aFRva2VuQ3RvclBhcmFtcyk7XHJcbiAgICAgICAgdGhpcy5fb3BlbklkID0gJyc7XHJcbiAgICB9XHJcblxyXG4gICAgLyoqXHJcbiAgICAgKiBSZXR1cm5zIHRoZSBuZWNlc3NhcnkgaW5mb3JtYXRpb24gZm9yIHBlcmlzdGVuY2UuXHJcbiAgICAgKi9cclxuICAgIHBlcnNpc3RlbnQoKTogSU9wZW5JRFRva2VuIHtcclxuICAgICAgICBjb25zdCByID0gc3VwZXIucGVyc2lzdGVudCgpO1xyXG4gICAgICAgIHJldHVybiB7IC4uLnIsIG9wZW5JZDogdGhpcy5fb3BlbklkIH07XHJcbiAgICB9XHJcblxyXG4gICAgLyoqXHJcbiAgICAgKiBSZWFkcyBjcmVkZW50aWFsIGZyb20gdGhlIGdpdmVuIHNldHRpbmdzLlxyXG4gICAgICovXHJcbiAgICByZWFkRnJvbShzZXR0aW5nczogSU9wZW5JRFRva2VuKSB7XHJcbiAgICAgICAgc3VwZXIucmVhZEZyb20oc2V0dGluZ3MpO1xyXG4gICAgICAgIHRoaXMuX29wZW5JZCA9IHNldHRpbmdzLm9wZW5JZDtcclxuICAgICAgICByZXR1cm4gdGhpcztcclxuICAgIH1cclxufVxyXG4iXX0=

@@ -1,28 +1,36 @@
 {
   "name": "@polpware/fe-data",
-  "version": "9.1.2",
+  "version": "13.0.0",
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
   "peerDependencies": {
-    "@angular/common": "^9.0.0",
-    "@angular/core": "^9.0.0",
-    "@ngrx/store": "^9.0.0",
-    "@ngrx/store-devtools": "^9.0.0",
-    "@polpware/fe-dependencies": "^1.5.0",
-    "@polpware/fe-utilities": "^9.0.0",
+    "@angular/common": "^13.0.0",
+    "@angular/core": "^13.0.0",
+    "@ngrx/store": "^13.0.0",
+    "@ngrx/store-devtools": "^13.0.0",
+    "@polpware/fe-dependencies": "^1.6.0",
+    "@polpware/fe-utilities": "^13.0.0",
     "polpware-tinymce-tailor": "^4.7.0"
   },
-  "main": "bundles/polpware-fe-data.umd.js",
-  "module": "fesm5/polpware-fe-data.js",
-  "es2015": "fesm2015/polpware-fe-data.js",
-  "esm5": "esm5/polpware-fe-data.js",
-  "esm2015": "esm2015/polpware-fe-data.js",
-  "fesm5": "fesm5/polpware-fe-data.js",
-  "fesm2015": "fesm2015/polpware-fe-data.js",
+  "module": "fesm2015/polpware-fe-data.mjs",
+  "es2020": "fesm2020/polpware-fe-data.mjs",
+  "esm2020": "esm2020/polpware-fe-data.mjs",
+  "fesm2020": "fesm2020/polpware-fe-data.mjs",
+  "fesm2015": "fesm2015/polpware-fe-data.mjs",
   "typings": "polpware-fe-data.d.ts",
-  "sideEffects": false,
-  "dependencies": {
-    "tslib": "^1.10.0"
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./polpware-fe-data.d.ts",
+      "esm2020": "./esm2020/polpware-fe-data.mjs",
+      "es2020": "./fesm2020/polpware-fe-data.mjs",
+      "es2015": "./fesm2015/polpware-fe-data.mjs",
+      "node": "./fesm2015/polpware-fe-data.mjs",
+      "default": "./fesm2020/polpware-fe-data.mjs"
+    }
   },
-  "scripts": {
-    "prepublishOnly": "node --eval \"console.error('ERROR: Trying to publish a package that has been compiled by Ivy. This is not allowed.\\nPlease delete and rebuild the package, without compiling with Ivy, before attempting to publish.\\n')\" && exit 1"
-  }
+  "sideEffects": false
 }
