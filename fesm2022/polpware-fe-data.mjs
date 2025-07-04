@@ -709,6 +709,34 @@ SlidingExpirationCache = __decorate([
     observableDecorator
 ], SlidingExpirationCache);
 
+//
+// Author:: Tom Tang <principlewar@gmail.com>
+// Copyright:: Copyright (c) 2017, Xiaolong Tang
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Except as contained in this notice, the name(s) of the above copyright
+// holders shall not be used in advertising or otherwise to promote the
+// sale, use or other dealings in this Software without prior written
+// authorization.
+
 const DummyOAuthTokenCtorParams = {
     url: 'dummy',
     clientId: 'dummy',
@@ -886,7 +914,7 @@ class OAuthTokenPolicy extends PolicyBase {
 function adaptToOpenIDToken(data) {
     data = data || {};
     const r = adaptToOAuthToken(data);
-    return Object.assign(Object.assign({}, r), { openId: data.openId || '' });
+    return { ...r, openId: data.openId || '' };
 }
 class OpenIDPolicy extends OAuthTokenPolicy {
     constructor() {
@@ -898,7 +926,7 @@ class OpenIDPolicy extends OAuthTokenPolicy {
      */
     persistent() {
         const r = super.persistent();
-        return Object.assign(Object.assign({}, r), { openId: this._openId });
+        return { ...r, openId: this._openId };
     }
     /**
      * Reads credential from the given settings.
@@ -1169,7 +1197,7 @@ class AntiForgeryKeyPolicy extends PolicyBase {
 class OAuthTokenExtPolicy extends OAuthTokenPolicy {
     constructor(settings, payload) {
         super(settings);
-        this._payload = Object.assign({}, payload);
+        this._payload = { ...payload };
     }
     get payload() {
         return this._payload;
@@ -1177,7 +1205,7 @@ class OAuthTokenExtPolicy extends OAuthTokenPolicy {
     // override
     getParams() {
         const p = super.getParams();
-        return Object.assign(Object.assign({}, p), this._payload);
+        return { ...p, ...this._payload };
     }
 }
 
@@ -1191,10 +1219,13 @@ function reducer(state, action) {
                 });
                 return index === -1;
             });
-            return Object.assign(Object.assign({}, state), { items: [
+            return {
+                ...state,
+                items: [
                     ...state.items,
                     ...payload
-                ] });
+                ]
+            };
         }
         case 'REMOVE': {
             const newItems = state.items.filter(x => {
@@ -1203,7 +1234,10 @@ function reducer(state, action) {
                 });
                 return index === -1;
             });
-            return Object.assign(Object.assign({}, state), { items: newItems });
+            return {
+                ...state,
+                items: newItems
+            };
         }
         case 'MODIFY': {
             // Nothing to do
@@ -1309,10 +1343,10 @@ class CollectionStore extends CollectionAbstractStore {
     getState() {
         return this._store.select('collection');
     }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CollectionStore, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
+    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CollectionStore }); }
 }
-CollectionStore.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "15.2.10", ngImport: i0, type: CollectionStore, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-CollectionStore.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "15.2.10", ngImport: i0, type: CollectionStore });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "15.2.10", ngImport: i0, type: CollectionStore, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CollectionStore, decorators: [{
             type: Injectable
         }], ctorParameters: function () { return []; } });
 
@@ -2124,6 +2158,90 @@ class ResourceLoader {
         });
     }
 }
+
+//
+// Author:: Tom Tang <principlewar@gmai.com>
+// Copyright:: Copyright (c) 2017, Xiaolong Tang
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Except as contained in this notice, the name(s) of the above copyright
+// holders shall not be used in advertising or otherwise to promote the
+// sale, use or other dealings in this Software without prior written
+// authorization.
+
+//
+// Author:: Tom Tang <principlewar@gmai.com>
+// Copyright:: Copyright (c) 2017, Xiaolong Tang
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Except as contained in this notice, the name(s) of the above copyright
+// holders shall not be used in advertising or otherwise to promote the
+// sale, use or other dealings in this Software without prior written
+// authorization.
+
+//
+// Author:: Tom Tang <principlewar@gmai.com>
+// Copyright:: Copyright (c) 2017, Xiaolong Tang
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// Except as contained in this notice, the name(s) of the above copyright
+// holders shall not be used in advertising or otherwise to promote the
+// sale, use or other dealings in this Software without prior written
+// authorization.
 
 /**
  * Generated bundle index. Do not edit.
