@@ -381,7 +381,7 @@ const $$2 = dependencies.jquery;
  */
 function loadJsonUriP(url) {
     const deferred = $$2.ajax({
-        url: url,
+        url: url, /* 'lang/options.json', */
         cache: true,
         dataType: 'json'
     });
@@ -1079,7 +1079,7 @@ const defaultElementTag = '';
  */
 function getTokenInternal(url, elementTag, inputField) {
     return $.ajax({
-        url: url,
+        url: url, // A page containing required tokens
         dataType: 'html text'
     }).then(function (data) {
         /*global DOMParser */
@@ -1343,12 +1343,12 @@ class CollectionStore extends CollectionAbstractStore {
     getState() {
         return this._store.select('collection');
     }
-    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CollectionStore, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
-    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CollectionStore }); }
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "17.3.12", ngImport: i0, type: CollectionStore, deps: [], target: i0.ɵɵFactoryTarget.Injectable }); }
+    static { this.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "17.3.12", ngImport: i0, type: CollectionStore }); }
 }
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.2.12", ngImport: i0, type: CollectionStore, decorators: [{
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "17.3.12", ngImport: i0, type: CollectionStore, decorators: [{
             type: Injectable
-        }], ctorParameters: function () { return []; } });
+        }], ctorParameters: () => [] });
 
 /**
  * @fileOverview
