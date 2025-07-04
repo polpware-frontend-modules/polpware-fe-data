@@ -1,16 +1,16 @@
 {
   "name": "@polpware/fe-data",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "dependencies": {
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
     "@angular/common": "^13.0.0",
     "@angular/core": "^13.0.0",
-    "@ngrx/store": "^13.0.0",
-    "@ngrx/store-devtools": "^13.0.0",
+    "@ngrx/store": "^14.0.0",
+    "@ngrx/store-devtools": "^14.0.0",
     "@polpware/fe-dependencies": "^1.6.0",
-    "@polpware/fe-utilities": "^13.0.0",
+    "@polpware/fe-utilities": "^14.0.0",
     "polpware-tinymce-tailor": "^4.7.0"
   },
   "module": "fesm2015/polpware-fe-data.mjs",
@@ -18,13 +18,13 @@
   "esm2020": "esm2020/polpware-fe-data.mjs",
   "fesm2020": "fesm2020/polpware-fe-data.mjs",
   "fesm2015": "fesm2015/polpware-fe-data.mjs",
-  "typings": "polpware-fe-data.d.ts",
+  "typings": "index.d.ts",
   "exports": {
     "./package.json": {
       "default": "./package.json"
     },
     ".": {
-      "types": "./polpware-fe-data.d.ts",
+      "types": "./index.d.ts",
       "esm2020": "./esm2020/polpware-fe-data.mjs",
       "es2020": "./fesm2020/polpware-fe-data.mjs",
       "es2015": "./fesm2015/polpware-fe-data.mjs",

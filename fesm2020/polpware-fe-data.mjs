@@ -1266,9 +1266,9 @@ class CollectionStore extends CollectionAbstractStore {
         return this._store.select('collection');
     }
 }
-CollectionStore.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "13.3.2", ngImport: i0, type: CollectionStore, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-CollectionStore.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "13.3.2", ngImport: i0, type: CollectionStore });
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "13.3.2", ngImport: i0, type: CollectionStore, decorators: [{
+CollectionStore.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "14.3.0", ngImport: i0, type: CollectionStore, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
+CollectionStore.ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "14.3.0", ngImport: i0, type: CollectionStore });
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "14.3.0", ngImport: i0, type: CollectionStore, decorators: [{
             type: Injectable
         }], ctorParameters: function () { return []; } });
 
