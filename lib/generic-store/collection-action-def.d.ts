@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-export declare type CollectionActionTypes = 'ADD' | 'REMOVE' | 'MODIFY';
+export type CollectionActionTypes = 'ADD' | 'REMOVE' | 'MODIFY';
 export interface ICollectionItem {
     id: string | number;
 }
