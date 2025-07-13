@@ -1,15 +1,15 @@
 {
   "name": "@polpware/fe-data",
-  "version": "14.0.0",
+  "version": "14.0.1",
   "dependencies": {
     "tslib": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/common": "^13.0.0",
-    "@angular/core": "^13.0.0",
+    "@angular/common": "^14.0.0",
+    "@angular/core": "^14.0.0",
     "@ngrx/store": "^14.0.0",
     "@ngrx/store-devtools": "^14.0.0",
-    "@polpware/fe-dependencies": "^1.6.0",
+    "@polpware/fe-dependencies": "^14.0.0",
     "@polpware/fe-utilities": "^14.0.0",
     "polpware-tinymce-tailor": "^4.7.0"
   },
