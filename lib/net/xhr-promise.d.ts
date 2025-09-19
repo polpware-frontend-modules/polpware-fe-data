@@ -1,7 +1,3 @@
-/**
- * @fileOverview
- * Defines a class for performing XHR in an exception way and in a promise way
- */
 export interface IXHRCtorOption {
     url: string;
     async?: boolean;

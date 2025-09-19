@@ -6,7 +6,7 @@
  * @license Copyright @me
  */
 export declare class I18n {
-    static getDictByCode(code: string): any;
+    static getDictByCode(code: string): Record<string, string>;
     /**
      * Add a languge dictionary and set the current
      * code as the current language.
@@ -20,7 +20,7 @@ export declare class I18n {
      * @param {String} defaultText The default value.
      * @returns {String} The translation for the given text.
      */
-    static translate(text: string, defaultText: string): any;
+    static translate(text: string, defaultText: string): string;
     /**
      * Removes unused languages to release memory.
      * @function recycleOthers
