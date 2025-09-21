@@ -639,7 +639,7 @@ function observableDecorator(constructor) {
 // authorization.
 const locache = legacyLibs.locache;
 const meld$1 = legacyLibs.meld;
-const originalRemove = Object.getPrototypeOf(locache.locache).remove;
+const originalRemove = Object.getPrototypeOf(locache).remove;
 const currentTime = function () {
     return new Date().getTime();
 };
@@ -647,7 +647,7 @@ let SlidingExpirationCache = class SlidingExpirationCache {
     constructor(_defaultSeconds, scheduleInterval, ngZone) {
         this._defaultSeconds = _defaultSeconds;
         const backend = new MemoryBackend();
-        this._cache = locache.locache.createCache({ storage: backend });
+        this._cache = locache.createCache({ storage: backend });
         this._cache.remove = meld$1.around(originalRemove, (input) => {
             const key = input.args[0];
             const onExpireEvtName = this.onExpireEventName(key);
@@ -1430,7 +1430,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
  * Also note that it is the provider generator's responsibilty for
  * preversing the state of each data provider.
  */
-const when = legacyLibs.when;
 const _$3 = legacyLibs._;
 function hasNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
@@ -1479,7 +1478,7 @@ class AggregateCollection {
                     return resp;
                 });
             });
-            return when.settle(promises);
+            return Promise.all(promises);
         });
     }
     getNextPage() {
