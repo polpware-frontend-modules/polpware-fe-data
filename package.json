@@ -1,6 +1,6 @@
 {
   "name": "@polpware/fe-data",
-  "version": "19.3.0",
+  "version": "19.4.0",
   "dependencies": {
     "tslib": "^2.0.0"
   },
@@ -11,7 +11,7 @@
     "@ngrx/store-devtools": "^19.0.0",
     "@polpware/amd-bridge": "^2.0.0",
     "@polpware/fe-utilities": "^19.0.0",
-    "@polpware/tinymce-tailor": "^0.1"
+    "@polpware/tinymce-tailor": "~0.x.0"
   },
   "module": "fesm2022/polpware-fe-data.mjs",
   "typings": "index.d.ts",
