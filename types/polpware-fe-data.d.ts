@@ -201,10 +201,6 @@ interface IRelationDatabaseSchema {
     };
 }
 
-/**
- * @fileOverview
- * Defines a class for performing XHR in an exception way and in a promise way
- */
 interface IXHRCtorOption {
     url: string;
     async?: boolean;
@@ -955,7 +951,7 @@ declare class LocalStorageTable {
  * @license Copyright @me
  */
 declare class I18n {
-    static getDictByCode(code: string): any;
+    static getDictByCode(code: string): Record<string, string>;
     /**
      * Add a languge dictionary and set the current
      * code as the current language.
@@ -969,7 +965,7 @@ declare class I18n {
      * @param {String} defaultText The default value.
      * @returns {String} The translation for the given text.
      */
-    static translate(text: string, defaultText: string): any;
+    static translate(text: string, defaultText: string): string;
     /**
      * Removes unused languages to release memory.
      * @function recycleOthers

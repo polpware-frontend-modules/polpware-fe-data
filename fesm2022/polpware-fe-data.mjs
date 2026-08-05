@@ -1,19 +1,23 @@
-import * as dependencies from '@polpware/fe-dependencies';
+import { legacyLibs } from '@polpware/amd-bridge';
 import * as polpwareUtil from '@polpware/fe-utilities';
 import { pushArray, urlEncode, lift, safeParseInt, isArray, liftWithGuard, defaultValue, ok, tyArray } from '@polpware/fe-utilities';
+import Observable from '@polpware/tinymce-tailor/api/util/Observable';
+import Tools from '@polpware/tinymce-tailor/api/util/Tools';
 import { __decorate } from 'tslib';
+import EventDispatcher from '@polpware/tinymce-tailor/api/util/EventDispatcher';
 import * as ngrxStore from '@ngrx/store';
 import * as i0 from '@angular/core';
 import { Injectable } from '@angular/core';
+import _i18n from '@polpware/tinymce-tailor/api/util/I18n';
 
 /**
  * @fileOverview
  * Defines a table in a relational database.
  * This table is observable, i.e., any change on this table will be notified to its listeners.
  */
-const backbone$3 = dependencies.backbone;
-const _$8 = dependencies.underscore;
-const cjs = dependencies.constraintjs;
+const backbone$3 = legacyLibs.Backbone;
+const _$8 = legacyLibs._;
+const cjs = legacyLibs.cjs;
 class RelationalTable {
     constructor(options, dummyRecords) {
         this.dummyRecords = dummyRecords;
@@ -219,7 +223,7 @@ class RelationalTable {
  * @fileOverview
  * Defines a global dummy records for tables. Each table is configured with a dummy record.
  */
-const backbone$2 = dependencies.backbone;
+const backbone$2 = legacyLibs.Backbone;
 class DummyRecords {
     constructor() {
         this._data = {};
@@ -304,8 +308,76 @@ class RelationDatabase {
  * @fileOverview
  * Defines a class for performing XHR in an exception way and in a promise way
  */
-const XHR = dependencies.XHR;
-const _$7 = dependencies.underscore;
+const _$7 = legacyLibs._;
+const XHR = {
+    /**
+     * Sends a XMLHTTPRequest.
+     * Consult the Wiki for details on what settings this method takes.
+     *
+     * @method send
+     * @param {Object} settings Object will target URL, callbacks and other info needed to make the request.
+     */
+    send: function (settings) {
+        var xhr, count = 0;
+        var ready = function () {
+            if (!settings.async || xhr.readyState == 4 || count++ > 10000) {
+                if (settings.success && count < 10000 && xhr.status == 200) {
+                    if (settings.response_type === '' || settings.response_type === 'text') {
+                        settings.success.call(settings.success_scope, '' + xhr.responseText, xhr, settings);
+                    }
+                    else {
+                        settings.success.call(settings.success_scope, xhr.response, xhr, settings);
+                    }
+                }
+                else if (settings.error) {
+                    settings.error.call(settings.error_scope, count > 10000 ? 'TIMED_OUT' : 'GENERAL', xhr, settings);
+                }
+                xhr = null;
+            }
+            else {
+                setTimeout(ready, 10);
+            }
+        };
+        // Default settings
+        settings.scope = settings.scope || this;
+        settings.success_scope = settings.success_scope || settings.scope;
+        settings.error_scope = settings.error_scope || settings.scope;
+        settings.async = settings.async === false ? false : true;
+        settings.data = settings.data || '';
+        XHR.fire('beforeInitialize', { settings: settings });
+        xhr = new XMLHttpRequest();
+        if (xhr) {
+            if (xhr.overrideMimeType) {
+                xhr.overrideMimeType(settings.content_type);
+            }
+            xhr.open(settings.type || (settings.data ? 'POST' : 'GET'), settings.url, settings.async);
+            if (settings.crossDomain) {
+                xhr.withCredentials = true;
+            }
+            if (settings.content_type) {
+                xhr.setRequestHeader('Content-Type', settings.content_type);
+            }
+            if (settings.response_type) {
+                xhr.responseType = settings.response_type;
+            }
+            if (settings.requestheaders) {
+                Tools.each(settings.requestheaders, function (header) {
+                    xhr.setRequestHeader(header.key, header.value);
+                });
+            }
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr = XHR.fire('beforeSend', { xhr: xhr, settings: settings }).xhr;
+            xhr.send(settings.data);
+            // Syncronous request
+            if (!settings.async) {
+                return ready();
+            }
+            // Wait for response, onReadyStateChange can not be used since it leaks memory in IE
+            setTimeout(ready, 10);
+        }
+    }
+};
+Tools.extend(XHR, Observable);
 const defaultOptions = {
     async: true,
     content_type: '',
@@ -364,8 +436,7 @@ function sendPromise(options) {
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
-const tools = dependencies.Tools;
-const $$2 = dependencies.jquery;
+const $$2 = legacyLibs.$;
 /**
  * Load a local json file from the given url.
  * This method encapsulates the behavior of loading a local json
@@ -396,7 +467,7 @@ function loadJsonUriP(url) {
  */
 function pingP(url, options) {
     options = options || {};
-    const ajaxParams = tools.extend({ url: url }, options);
+    const ajaxParams = Tools.extend({ url: url }, options);
     return $$2.ajax(ajaxParams);
 }
 /**
@@ -492,7 +563,6 @@ class MemoryBackend {
 // holders shall not be used in advertising or otherwise to promote the
 // sale, use or other dealings in this Software without prior written
 // authorization.
-const EventDispatcher = dependencies.EventDispatcher;
 const getEventDispatcher = function (obj) {
     if (!obj._eventDispatcher) {
         obj._eventDispatcher = new EventDispatcher({
@@ -567,9 +637,9 @@ function observableDecorator(constructor) {
 // holders shall not be used in advertising or otherwise to promote the
 // sale, use or other dealings in this Software without prior written
 // authorization.
-const locache = dependencies.locache;
-const meld$1 = dependencies.meld;
-const originalRemove = Object.getPrototypeOf(locache.locache).remove;
+const locache = legacyLibs.locache;
+const meld$1 = legacyLibs.meld;
+const originalRemove = Object.getPrototypeOf(locache).remove;
 const currentTime = function () {
     return new Date().getTime();
 };
@@ -577,7 +647,7 @@ let SlidingExpirationCache = class SlidingExpirationCache {
     constructor(_defaultSeconds, scheduleInterval, ngZone) {
         this._defaultSeconds = _defaultSeconds;
         const backend = new MemoryBackend();
-        this._cache = locache.locache.createCache({ storage: backend });
+        this._cache = locache.createCache({ storage: backend });
         this._cache.remove = meld$1.around(originalRemove, (input) => {
             const key = input.args[0];
             const onExpireEvtName = this.onExpireEventName(key);
@@ -748,7 +818,7 @@ const DummyOAuthTokenCtorParams = {
  * @fileOverview
  * A base class for defining security plicies.
  */
-const _$6 = dependencies.underscore;
+const _$6 = legacyLibs._;
 class PolicyBase {
     constructor(settings) {
         this.url = settings.url;
@@ -781,8 +851,8 @@ class PolicyBase {
  * @fileOverview
  * Defines a base class for retrieving OAuth2 tokens.
  */
-const _$5 = dependencies.underscore;
-const $$1 = dependencies.jquery;
+const _$5 = legacyLibs._;
+const $$1 = legacyLibs.$;
 function adaptToOAuthToken(data) {
     data = data || {};
     data.expiresIn = data.expiresIn || 0;
@@ -956,7 +1026,7 @@ class NullPolicy {
     reset() { }
 }
 
-const _$4 = dependencies.underscore;
+const _$4 = legacyLibs._;
 function isEquiva(a, b) {
     // Strict equals
     if (a === b) {
@@ -1070,7 +1140,7 @@ UserCredential = __decorate([
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
-const $ = dependencies.jquery;
+const $ = legacyLibs.$;
 const defaultAntiForgeryKey = '__RequestVerificationToken';
 const defaultElementTag = '';
 /*
@@ -1360,8 +1430,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "21.2.19", ngImpo
  * Also note that it is the provider generator's responsibilty for
  * preversing the state of each data provider.
  */
-const when = dependencies.when;
-const _$3 = dependencies.underscore;
+const _$3 = legacyLibs._;
 function hasNextPage(collection) {
     if (!collection.state.totalPages && !collection.state.totalRecords) {
         return true;
@@ -1409,7 +1478,7 @@ class AggregateCollection {
                     return resp;
                 });
             });
-            return when.settle(promises);
+            return Promise.all(promises);
         });
     }
     getNextPage() {
@@ -1434,8 +1503,8 @@ class AggregateCollection {
  * A decorator to Backbone. It tracks all sync events of the Backbone
  * in a nonintrusive manner.
  */
-const backbone$1 = dependencies.backbone;
-const meld = dependencies.meld;
+const backbone$1 = legacyLibs.Backbone;
+const meld = legacyLibs.meld;
 /**
  * The callback for the sync event.
  * @callback EventHubcallback
@@ -1501,9 +1570,9 @@ function mountAjaxBeforeAdvice(callback) {
  * and caching some type of objects for a period of time.
  */
 /*jslint unparam: true */
-const DataFlow = dependencies['dataflow'];
-const backbone = dependencies['backbone'];
-const _$2 = dependencies.underscore;
+const DataFlow = legacyLibs.ModelJs;
+const backbone = legacyLibs.Backbone;
+const _$2 = legacyLibs._;
 /**
  * The endpoint types for a backend service.
  */
@@ -1787,12 +1856,13 @@ class GlobalProvider {
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
+const _$1 = legacyLibs._;
 // as polyfill for localstorage
 // Do NOT use the LocalStorage as there is global variable which cannot be resolved
 // and which is defined only in TINYMCE.
 // import * as localStorage from 'polpware-tinymce-tailor/src/util/LocalStorage.js';
 const globalLocalStorage = window.localStorage;
-const _$1 = dependencies.underscore, find = _$1.find, findIndex = _$1.findIndex, union = _$1.union;
+const find = _$1.find, findIndex = _$1.findIndex, union = _$1.union;
 /**
  * Reads the value of an entity by its key.
  * @function getEntity
@@ -1986,10 +2056,9 @@ class LocalStorageTable {
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
-const _i18n = dependencies.I18n;
 class I18n {
     static getDictByCode(code) {
-        return _i18n.data[code];
+        return _i18n.getData()[code];
     }
     /**
      * Add a languge dictionary and set the current
@@ -2019,7 +2088,7 @@ class I18n {
      * @param {String} code The language code which should not released.
      */
     static recycleOthers(code) {
-        const data = _i18n.data;
+        const data = _i18n.getData();
         const recycleList = [];
         for (const key in data) {
             // skip loop if the property is from prototype
@@ -2054,7 +2123,7 @@ class I18n {
  * @author Xiaolong Tang <xxlongtang@gmail.com>
  * @license Copyright @me
  */
-const _ = dependencies.underscore;
+const _ = legacyLibs._;
 const isString = _.isString;
 /**
  * Retrieves a value from a variable by a given namespace nested structure.
