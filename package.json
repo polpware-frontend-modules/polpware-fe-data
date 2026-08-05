@@ -14,15 +14,16 @@
     "polpware-tinymce-tailor": "^4.7.0"
   },
   "module": "fesm2022/polpware-fe-data.mjs",
-  "typings": "index.d.ts",
+  "typings": "types/polpware-fe-data.d.ts",
   "exports": {
     "./package.json": {
       "default": "./package.json"
     },
     ".": {
-      "types": "./index.d.ts",
+      "types": "./types/polpware-fe-data.d.ts",
       "default": "./fesm2022/polpware-fe-data.mjs"
     }
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "type": "module"
 }
